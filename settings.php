@@ -25,8 +25,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 if ($hassiteconfig) {
-    $ADMIN->add('localplugins', new admin_category('local_aurasupport_category', get_string('pluginname', 'local_aurasupport')));
-    
     $settings = new admin_settingpage('local_aurasupport', get_string('pluginname', 'local_aurasupport'));
     
     $settings->add(new admin_setting_configcheckbox('local_aurasupport/enable_email',
@@ -62,5 +60,5 @@ if ($hassiteconfig) {
             'antigravity-agent-preview' => 'Antigravity Agent Preview (Managed Agent)'
         ]));
         
-    $ADMIN->add('local_aurasupport_category', $settings);
+    $ADMIN->add('localplugins', $settings);
 }
