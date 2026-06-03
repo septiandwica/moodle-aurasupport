@@ -1,0 +1,193 @@
+<div class="container-fluid p-0">
+    <div class="local_aurasupport-header">
+        <h2>{{#str}}dashboard, local_aurasupport{{/str}}</h2>
+        <p>AuraSupport Analytics and Insights</p>
+    </div>
+
+    <div class="local_aurasupport-dashboard-grid">
+        <div class="local_aurasupport-card local_aurasupport-stat-card bg-gradient-primary">
+            <h5>{{#str}}total_tickets, local_aurasupport{{/str}}</h5>
+            <h1 class="display-4 font-weight-bold m-0">{{total}}</h1>
+        </div>
+        <div class="local_aurasupport-card local_aurasupport-stat-card bg-gradient-danger">
+            <h5>{{#str}}open_tickets, local_aurasupport{{/str}}</h5>
+            <h1 class="display-4 font-weight-bold m-0">{{open}}</h1>
+        </div>
+        <div class="local_aurasupport-card local_aurasupport-stat-card bg-gradient-success">
+            <h5>{{#str}}resolved_tickets, local_aurasupport{{/str}}</h5>
+            <h1 class="display-4 font-weight-bold m-0">{{resolved}}</h1>
+        </div>
+        <div class="local_aurasupport-card local_aurasupport-stat-card bg-gradient-secondary">
+            <h5>{{#str}}closed_tickets, local_aurasupport{{/str}}</h5>
+            <h1 class="display-4 font-weight-bold m-0">{{closed}}</h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card local_aurasupport-card mb-4">
+                <div class="card-header font-weight-bold">Tickets Over Time (Last 30 Days)</div>
+                <div class="card-body">
+                    <div id="trendChart"></div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card local_aurasupport-card mb-4">
+                        <div class="card-header font-weight-bold">{{#str}}ticket_status_chart, local_aurasupport{{/str}}</div>
+                        <div class="card-body">
+                            <div id="statusChart"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card local_aurasupport-card mb-4">
+                        <div class="card-header font-weight-bold">Tickets by Priority</div>
+                        <div class="card-body">
+                            <div id="priorityChart"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card local_aurasupport-card mb-4">
+                        <div class="card-header font-weight-bold">Tickets by Department</div>
+                        <div class="card-body">
+                            <div id="deptChart"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card local_aurasupport-card mb-4">
+                        <div class="card-header font-weight-bold">Tickets by Course</div>
+                        <div class="card-body">
+                            <div id="courseChart"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card local_aurasupport-card mb-4">
+                <div class="card-header font-weight-bold bg-danger text-white">Recent Unresolved Tickets</div>
+                <div class="card-body p-0">
+                    <table class="table table-striped mb-0">
+                        <thead>
+                            <tr><th>Subject</th><th>User</th><th>Date</th></tr>
+                        </thead>
+                        <tbody>
+                            {{{recent_unresolved_html}}}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card local_aurasupport-card mb-4 bg-primary text-white text-center">
+                <div class="card-body">
+                    <h5 class="card-title">Average Resolution Time</h5>
+                    <h2 class="display-4 font-weight-bold">{{avg_response_time}}</h2>
+                    <p class="mb-0">Speed of service delivery</p>
+                </div>
+            </div>
+            
+            <div class="card local_aurasupport-card mb-4">
+                <div class="card-header font-weight-bold bg-gradient-success text-white">Top Agents Leaderboard</div>
+                <div class="card-body p-0">
+                    <table class="table table-striped mb-0">
+                        <thead>
+                            <tr><th>Agent Name</th><th>Resolved Tickets</th></tr>
+                        </thead>
+                        <tbody>
+                            {{{leader_html}}}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="card local_aurasupport-card mb-4">
+                <div class="card-header font-weight-bold bg-gradient-info text-white">Most Active Users</div>
+                <div class="card-body p-0">
+                    <table class="table table-striped mb-0">
+                        <thead>
+                            <tr><th>User Name</th><th>Tickets Opened</th></tr>
+                        </thead>
+                        <tbody>
+                            {{{top_users_html}}}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var rawdata = '{{{chartdata}}}';
+    var advrawdata = '{{{advdata}}}';
+    var data = JSON.parse(rawdata.replace(/&quot;/g, '"'));
+    var advdata = JSON.parse(advrawdata.replace(/&quot;/g, '"'));
+    
+    // Status Pie Chart
+    var statusOptions = {
+        series: data.status_series,
+        chart: { type: 'donut', height: 300 },
+        labels: data.status_labels,
+        colors: ['#dc3545', '#ffc107', '#28a745', '#6c757d'],
+        responsive: [{ breakpoint: 480, options: { chart: { width: 200 }, legend: { position: 'bottom' } } }]
+    };
+    var statusChart = new ApexCharts(document.querySelector("#statusChart"), statusOptions);
+    statusChart.render();
+    
+    // Trend Line Chart
+    var trendOptions = {
+        series: [{ name: "Tickets", data: advdata.trend_counts }],
+        chart: { type: 'area', height: 300, toolbar: { show: false } },
+        dataLabels: { enabled: false },
+        stroke: { curve: 'smooth', width: 2 },
+        xaxis: { categories: advdata.trend_dates },
+        colors: ['#0d6efd'],
+        fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.7, opacityTo: 0.9, stops: [0, 90, 100] } }
+    };
+    var trendChart = new ApexCharts(document.querySelector("#trendChart"), trendOptions);
+    trendChart.render();
+    
+    // Priority Chart
+    var priorityOptions = {
+        series: advdata.priority_data,
+        chart: { type: 'pie', height: 300 },
+        labels: advdata.priority_labels,
+        colors: ['#0dcaf0', '#ffc107', '#fd7e14', '#dc3545']
+    };
+    var priorityChart = new ApexCharts(document.querySelector("#priorityChart"), priorityOptions);
+    priorityChart.render();
+    
+    // Department Bar Chart
+    var deptOptions = {
+        series: [{ name: "Tickets", data: advdata.dept_data }],
+        chart: { type: 'bar', height: 300, toolbar: { show: false } },
+        plotOptions: { bar: { borderRadius: 4, horizontal: true } },
+        dataLabels: { enabled: true },
+        xaxis: { categories: advdata.dept_labels },
+        colors: ['#0dcaf0']
+    };
+    var deptChart = new ApexCharts(document.querySelector("#deptChart"), deptOptions);
+    deptChart.render();
+
+    // Course Bar Chart
+    var courseOptions = {
+        series: [{ name: "Tickets", data: advdata.course_data }],
+        chart: { type: 'bar', height: 300, toolbar: { show: false } },
+        plotOptions: { bar: { borderRadius: 4, horizontal: false, columnWidth: '50%' } },
+        dataLabels: { enabled: true },
+        xaxis: { categories: advdata.course_labels },
+        colors: ['#6f42c1']
+    };
+    var courseChart = new ApexCharts(document.querySelector("#courseChart"), courseOptions);
+    courseChart.render();
+});
+</script>
