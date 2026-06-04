@@ -51,7 +51,8 @@ if ($action === 'widget_create_ticket') {
     $ticket->userid = $USER->id;
     $ticket->departmentid = $dept;
     $ticket->subject = $subject;
-    $ticket->description = $desc;
+    // Format description as array because ticket::create expects it (from Moodle forms)
+    $ticket->description = ['text' => $desc, 'format' => FORMAT_MOODLE];
     $ticket->status = 0;
     $ticket->priority = $priority;
     
@@ -102,7 +103,8 @@ if ($action === 'widget_get_chat') {
 if ($action === 'widget_send_reply') {
     require_sesskey();
     $message = required_param('message', PARAM_TEXT);
-    \local_aurasupport\ticket::add_message($ticketid, $USER->id, $message);
+    // Format message as array because ticket::add_message expects it
+    \local_aurasupport\ticket::add_message($ticketid, $USER->id, ['text' => $message, 'format' => FORMAT_MOODLE]);
     echo json_encode(['success' => true]);
     die();
 }
