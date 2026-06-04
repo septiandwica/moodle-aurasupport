@@ -475,6 +475,10 @@ select.aurasupport-widget-input {
         border-radius: 0;
         border: none;
         z-index: 99999;
+        transform: none !important;
+    }
+    .aurasupport-widget-open .aurasupport-widget-panel {
+        transform: none !important;
     }
     .aurasupport-widget-open .aurasupport-floating-btn {
         display: none !important; 
