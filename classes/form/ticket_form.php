@@ -39,7 +39,7 @@ class ticket_form extends \moodleform {
         $mform->addRule('subject', get_string('required'), 'required', null, 'client');
 
         $context = \context_system::instance();
-        if (has_capability('local/aurasupport:manage', $context)) {
+        if (is_siteadmin()) {
             // Admin can select user
             $users = $DB->get_records_menu('user', ['deleted' => 0], 'firstname ASC', 'id, ' . $DB->sql_fullname());
             $mform->addElement('select', 'userid', 'For User (Admin Only)', [0 => 'Me'] + $users);

@@ -85,7 +85,7 @@ if ($id) {
     }
 }
 
-if (has_capability('local/aurasupport:manage', $context)) {
+if (is_siteadmin()) {
     echo html_writer::link(new moodle_url('/local/aurasupport/manage_kb.php'), 'Manage Articles', ['class' => 'btn btn-outline-primary mt-4']);
 }
 

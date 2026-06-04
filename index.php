@@ -27,7 +27,7 @@ require_once($CFG->dirroot . '/local/aurasupport/classes/analytics.php');
 
 $context = context_system::instance();
 require_login();
-require_capability('local/aurasupport:manage', $context); // Only managers/agents can see BI
+require_capability('moodle/site:config', $context); // Only managers/agents can see BI
 
 $PAGE->set_context($context);
 $PAGE->set_url(new moodle_url('/local/aurasupport/index.php'));

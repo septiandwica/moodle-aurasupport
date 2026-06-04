@@ -27,7 +27,7 @@ require_once($CFG->dirroot . '/local/aurasupport/classes/form/sla_form.php');
 
 $context = context_system::instance();
 require_login();
-require_capability('local/aurasupport:manage', $context);
+require_capability('moodle/site:config', $context);
 
 $delete = optional_param('delete', 0, PARAM_INT);
 if ($delete) {
