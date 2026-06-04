@@ -9,10 +9,15 @@
     <div id="aurasupport-widget-panel" class="aurasupport-widget-panel">
         <!-- Header -->
         <div class="aurasupport-widget-header bg-primary text-white">
-            <h5 class="m-0" id="aurasupport-widget-title">AuraSupport</h5>
-            <div>
-                <a href="{{wwwroot}}/local/aurasupport/tickets.php" target="_blank" class="text-white mr-2" title="View Full Dashboard"><i class="fa fa-external-link"></i></a>
-                <button id="aurasupport-widget-close" class="btn btn-sm btn-link text-white p-0"><i class="fa fa-times"></i></button>
+            <div class="aurasupport-widget-header-top">
+                <h5 class="m-0 font-weight-bold" id="aurasupport-widget-title" style="font-size: 1.1rem;"><i class="fa fa-life-ring mr-2"></i> AuraSupport</h5>
+                <div>
+                    <a href="{{wwwroot}}/local/aurasupport/tickets.php" target="_blank" class="text-white mr-3" title="View Full Dashboard" style="opacity: 0.8; transition: 0.2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.8"><i class="fa fa-external-link"></i></a>
+                    <button id="aurasupport-widget-close" class="btn btn-sm btn-link text-white p-0" style="opacity: 0.8; transition: 0.2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.8"><i class="fa fa-times fa-lg"></i></button>
+                </div>
+            </div>
+            <div class="aurasupport-widget-header-subtitle">
+                Hi there! 👋 Welcome to AuraSupport. How can we help you today?
             </div>
         </div>
 
