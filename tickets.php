@@ -171,7 +171,7 @@ require.config({
 require(['jquery', 'datatables.net', 'datatables.net-bs4', 'datatables.net-buttons', 'datatables.net-buttons-html5', 'datatables.net-buttons-print'], function($) {
     $(document).ready(function() {
         $('#ticketstable').DataTable({
-            dom: '<"row"<"col-sm-12 col-md-6"B><"col-sm-12 col-md-6"f>>rt<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
+            dom: '<\"row\"<\"col-sm-12 col-md-6\"B><\"col-sm-12 col-md-6\"f>>rt<\"row\"<\"col-sm-12 col-md-5\"i><\"col-sm-12 col-md-7\"p>>',
             buttons: [
                 { extend: 'copy', className: 'btn btn-outline-secondary btn-sm mr-1' },
                 { extend: 'csv', className: 'btn btn-outline-success btn-sm mr-1' },
