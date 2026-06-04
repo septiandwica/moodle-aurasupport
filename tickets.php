@@ -83,7 +83,7 @@ echo html_writer::end_tag('div');
 // Query Data
 $sqlwhere = '1=1';
 $params = [];
-if (!has_capability('moodle/site:config', $context)) {
+if (!is_siteadmin()) {
     $sqlwhere .= ' AND t.userid = :userid';
     $params['userid'] = $USER->id;
 }
@@ -186,7 +186,6 @@ require(['jquery', 'datatables.net', 'datatables.net-bs4', 'datatables.net-butto
 $PAGE->requires->js_amd_inline($js);
 
 echo html_writer::empty_tag('hr', ['class' => 'mt-5 mb-4']);
-echo html_writer::tag('h3', get_string('createticket', 'local_aurasupport'), ['class' => 'mb-4']);
 $mform->display();
 
 echo html_writer::end_tag('div'); // Close container

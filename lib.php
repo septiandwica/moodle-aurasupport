@@ -59,7 +59,7 @@ function local_aurasupport_print_tabs($current_tab = 'tickets') {
         'url' => new moodle_url('/local/aurasupport/kb.php')
     ];
 
-    if (has_capability('moodle/site:config', context_system::instance())) {
+    if (is_siteadmin()) {
         $tabs[] = [
             'id' => 'dashboard',
             'name' => 'BI Dashboard',
