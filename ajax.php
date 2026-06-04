@@ -81,6 +81,30 @@ if ($action === 'widget_create_ticket') {
     die();
 }
 
+if ($action === 'widget_suggest_kb') {
+    require_sesskey();
+    require_once($CFG->dirroot . '/local/aurasupport/classes/ai_manager.php');
+    $text = required_param('text', PARAM_TEXT);
+    
+    if (trim($text) !== '') {
+        $suggested = \local_aurasupport\ai_manager::suggest_kb($text);
+        if ($suggested) {
+            $url = new moodle_url('/local/aurasupport/kb.php', ['id' => $suggested->id]);
+            echo json_encode([
+                'success' => true, 
+                'article' => [
+                    'id' => $suggested->id, 
+                    'title' => format_string($suggested->title),
+                    'url' => $url->out(false)
+                ]
+            ]);
+            die();
+        }
+    }
+    echo json_encode(['success' => false]);
+    die();
+}
+
 $ticketid = required_param('ticketid', PARAM_INT);
 $ticket = \local_aurasupport\ticket::get_by_id($ticketid);
 if (!$ticket) {

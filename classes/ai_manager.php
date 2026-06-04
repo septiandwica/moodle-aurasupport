@@ -98,4 +98,74 @@ class ai_manager {
 
         return "<p>Failed to parse AI response.</p>";
     }
+
+    public static function suggest_kb($user_text) {
+        global $DB, $CFG;
+        require_once($CFG->libdir . '/filelib.php');
+
+        if (!self::is_enabled()) {
+            return null;
+        }
+
+        // Fetch all KB articles (only active ones ideally, but we'll assume all are for now)
+        $kbs = $DB->get_records('local_aurasupport_kb', null, '', 'id, title');
+        if (empty($kbs)) {
+            return null;
+        }
+
+        $kb_list = [];
+        foreach ($kbs as $kb) {
+            $kb_list[] = "ID: {$kb->id} | Title: {$kb->title}";
+        }
+        $kb_str = implode("\n", $kb_list);
+
+        $apikey = get_config('local_aurasupport', 'gemini_api_key');
+        $model = get_config('local_aurasupport', 'gemini_model');
+        if (empty($model)) {
+            $model = 'gemini-3.5-flash';
+        }
+
+        $url = 'https://generativelanguage.googleapis.com/v1beta/models/' . $model . ':generateContent?key=' . $apikey;
+
+        $prompt = "You are an intelligent support routing AI.\n";
+        $prompt .= "A user is writing a support ticket with the following issue description/subject:\n";
+        $prompt .= "\"" . $user_text . "\"\n\n";
+        $prompt .= "Here is a list of our Knowledge Base (KB) articles:\n";
+        $prompt .= $kb_str . "\n\n";
+        $prompt .= "Your task is to determine if any of these articles is highly relevant and likely to solve the user's issue.\n";
+        $prompt .= "If you find a highly relevant article, return ONLY its ID (an integer).\n";
+        $prompt .= "If no article is highly relevant, return ONLY the number 0.\n";
+        $prompt .= "Output ONLY a single integer. No other text.";
+
+        $data = [
+            'contents' => [
+                [
+                    'parts' => [
+                        ['text' => $prompt]
+                    ]
+                ]
+            ],
+            'generationConfig' => [
+                'temperature' => 0.1,
+                'maxOutputTokens' => 10
+            ]
+        ];
+
+        $curl = new \curl();
+        $curl->setHeader('Content-Type: application/json');
+        
+        $response = $curl->post($url, json_encode($data));
+        
+        if ($curl->get_info()['http_code'] === 200) {
+            $result = json_decode($response);
+            if (isset($result->candidates[0]->content->parts[0]->text)) {
+                $output = trim($result->candidates[0]->content->parts[0]->text);
+                $id = (int) $output;
+                if ($id > 0 && isset($kbs[$id])) {
+                    return $kbs[$id];
+                }
+            }
+        }
+        return null;
+    }
 }

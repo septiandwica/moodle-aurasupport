@@ -101,6 +101,15 @@
                     <label class="aurasupport-widget-label">Attachment <small class="text-muted">(Optional, PNG/JPG)</small></label>
                     <input type="file" id="aurasupport-widget-new-attach" class="aurasupport-widget-input" accept=".png, .jpg, .jpeg" style="padding: 6px 10px;">
                 </div>
+                <div id="aurasupport-widget-kb-suggestions" class="mb-3 d-none" style="background: linear-gradient(135deg, #e3f2fd, #bbdefb); border-radius: 8px; padding: 12px; font-size: 0.85rem; border: 1px solid #90caf9; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                    <div style="color: #1976d2; font-weight: bold; margin-bottom: 5px;">
+                        <i class="fa fa-magic"></i> Aura AI Suggestion
+                    </div>
+                    <div style="color: #0d47a1; margin-bottom: 8px;">Mungkinkah artikel ini dapat menyelesaikan masalah Anda?</div>
+                    <a id="aurasupport-widget-kb-link" href="#" target="_blank" style="display: block; background: white; padding: 8px 10px; border-radius: 6px; text-decoration: none; color: #1565c0; font-weight: 600; border: 1px solid #bbdefb; transition: all 0.2s;">
+                        <i class="fa fa-book mr-1"></i> <span id="aurasupport-widget-kb-title">Article Title</span>
+                    </a>
+                </div>
                 <button id="aurasupport-widget-btn-submit" class="aurasupport-submit-btn w-100">Submit Ticket</button>
             </div>
         </div>
@@ -354,15 +363,14 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Create Ticket
     document.getElementById('aurasupport-widget-btn-submit').addEventListener('click', function() {
-        var subject = document.getElementById('aurasupport-widget-new-subject').value.trim();
+        var subject = document.getElementById('aurasupport-widget-new-subject').value;
         var dept = document.getElementById('aurasupport-widget-new-dept').value;
         var priority = document.getElementById('aurasupport-widget-new-priority').value;
-        var desc = document.getElementById('aurasupport-widget-new-desc').value.trim();
+        var desc = document.getElementById('aurasupport-widget-new-desc').value;
         var attachInput = document.getElementById('aurasupport-widget-new-attach');
-        var file = attachInput.files.length > 0 ? attachInput.files[0] : null;
         
-        if (!subject || !desc || !dept) {
-            alert('Please fill in all required fields (Subject, Department, and Description).');
+        if (!subject || !dept || !desc) {
+            alert('Please fill subject, department, and description');
             return;
         }
         
@@ -375,22 +383,58 @@ document.addEventListener('DOMContentLoaded', function() {
         formData.append('department', dept);
         formData.append('priority', priority);
         formData.append('description', desc);
-        if (file) {
-            formData.append('attachment', file);
+        
+        if (attachInput.files.length > 0) {
+            formData.append('attachment', attachInput.files[0]);
         }
         
         apiCall('widget_create_ticket', formData, function(res) {
             btn.disabled = false;
-            btn.innerHTML = 'Submit Ticket';
-            if (res.success) {
+            btn.textContent = 'Submit Ticket';
+            if (res.error) {
+                alert(res.error);
+            } else {
+                // reset form
                 document.getElementById('aurasupport-widget-new-subject').value = '';
                 document.getElementById('aurasupport-widget-new-desc').value = '';
-                attachInput.value = '';
+                document.getElementById('aurasupport-widget-new-attach').value = '';
+                document.getElementById('aurasupport-widget-kb-suggestions').classList.add('d-none');
                 showList();
-            } else {
-                alert(res.error || 'Failed to create ticket');
             }
         });
+    });
+
+    // AI Ticket Deflection (Debounce logic)
+    var kbTypingTimer;
+    var kbDoneTypingInterval = 1500; // 1.5 seconds delay
+
+    function checkKBSuggestions() {
+        var subject = document.getElementById('aurasupport-widget-new-subject').value;
+        var desc = document.getElementById('aurasupport-widget-new-desc').value;
+        var combinedText = (subject + ' ' + desc).trim();
+        
+        if (combinedText.length > 10) {
+            apiCall('widget_suggest_kb', {text: combinedText}, function(res) {
+                var kbContainer = document.getElementById('aurasupport-widget-kb-suggestions');
+                if (res.success && res.article) {
+                    document.getElementById('aurasupport-widget-kb-title').textContent = res.article.title;
+                    document.getElementById('aurasupport-widget-kb-link').href = res.article.url;
+                    kbContainer.classList.remove('d-none');
+                } else {
+                    kbContainer.classList.add('d-none');
+                }
+            });
+        }
+    }
+
+    document.getElementById('aurasupport-widget-new-subject').addEventListener('keyup', function() {
+        clearTimeout(kbTypingTimer);
+        kbTypingTimer = setTimeout(checkKBSuggestions, kbDoneTypingInterval);
+    });
+    
+    document.getElementById('aurasupport-widget-new-desc').addEventListener('keyup', function() {
+        clearTimeout(kbTypingTimer);
+        kbTypingTimer = setTimeout(checkKBSuggestions, kbDoneTypingInterval);
     });
 });
 </script>
