@@ -60,5 +60,12 @@ if ($hassiteconfig) {
             'antigravity-agent-preview' => 'Antigravity Agent Preview (Managed Agent)'
         ]));
         
+    $settings->add(new admin_setting_heading('local_aurasupport/ui_heading', 'UI Settings', 'Configure the appearance of the widget.'));
+    
+    $settings->add(new admin_setting_configtext('local_aurasupport/widget_footer_text',
+        'Widget Footer Text',
+        'Text displayed at the bottom of the support widget (e.g. version info).',
+        'AuraSupport v1.0.0', PARAM_TEXT));
+        
     $ADMIN->add('localplugins', $settings);
 }

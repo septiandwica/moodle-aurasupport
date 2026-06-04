@@ -130,11 +130,17 @@ function local_aurasupport_before_footer() {
         ['id' => 3, 'name' => 'Urgent', 'is_normal' => false]
     ];
 
+    $footer_text = get_config('local_aurasupport', 'widget_footer_text');
+    if ($footer_text === false) {
+        $footer_text = 'AuraSupport v1.0.0';
+    }
+
     $template_data = [
         'wwwroot' => $CFG->wwwroot,
         'sesskey' => sesskey(),
         'departments' => $dept_arr,
-        'priorities' => $priorities
+        'priorities' => $priorities,
+        'footer_text' => $footer_text
     ];
 
     // Render the widget template
