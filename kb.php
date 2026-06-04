@@ -49,9 +49,13 @@ echo html_writer::end_tag('form');
 echo html_writer::end_tag('div');
 
 if ($id) {
-    $article = $DB->get_record('local_aurasupport_kb', ['id' => $id], '*', MUST_EXIST);
-    echo html_writer::tag('h2', format_string($article->title));
-    echo html_writer::tag('div', format_text($article->content, FORMAT_HTML), ['class' => 'box p-4 bg-white border rounded shadow-sm mt-3']);
+    $article = $DB->get_record('local_aurasupport_kb', ['id' => $id], '*', IGNORE_MISSING);
+    if ($article) {
+        echo html_writer::tag('h2', format_string($article->title));
+        echo html_writer::tag('div', format_text($article->content, FORMAT_HTML), ['class' => 'box p-4 bg-white border rounded shadow-sm mt-3']);
+    } else {
+        echo $OUTPUT->notification('The requested article could not be found. It may have been deleted.', 'error');
+    }
     echo html_writer::link(new moodle_url('/local/aurasupport/kb.php'), '&laquo; Back to all articles', ['class' => 'mt-4 d-block']);
 } else {
     $sql = "SELECT * FROM {local_aurasupport_kb} ";
