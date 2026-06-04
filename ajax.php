@@ -29,7 +29,8 @@ if (!$ticket) {
     die();
 }
 
-if (!is_siteadmin() && $ticket->userid != $USER->id) {
+$is_agent_for_this = \local_aurasupport\ticket::is_agent_for_ticket($USER->id, $ticket);
+if (!is_siteadmin() && $ticket->userid != $USER->id && !$is_agent_for_this) {
     echo json_encode(['error' => 'No permission']);
     die();
 }

@@ -85,4 +85,17 @@ class ticket {
         $DB->set_field('local_aurasupport_tickets', 'status', $status, ['id' => $ticketid]);
         $DB->set_field('local_aurasupport_tickets', 'timemodified', time(), ['id' => $ticketid]);
     }
+
+    public static function is_agent($userid) {
+        global $DB;
+        return $DB->record_exists('local_aurasupport_agents', ['userid' => $userid]);
+    }
+
+    public static function is_agent_for_ticket($userid, $ticket) {
+        global $DB;
+        if (empty($ticket->departmentid)) {
+            return self::is_agent($userid); // If no dept, all agents can see? Let's say yes for general tickets
+        }
+        return $DB->record_exists('local_aurasupport_agents', ['userid' => $userid, 'departmentid' => $ticket->departmentid]);
+    }
 }

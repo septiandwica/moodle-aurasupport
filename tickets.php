@@ -84,8 +84,23 @@ echo html_writer::end_tag('div');
 $sqlwhere = '1=1';
 $params = [];
 if (!is_siteadmin()) {
-    $sqlwhere .= ' AND t.userid = :userid';
-    $params['userid'] = $USER->id;
+    $is_agent = \local_aurasupport\ticket::is_agent($USER->id);
+    if ($is_agent) {
+        $agent_depts = $DB->get_fieldset_select('local_aurasupport_agents', 'departmentid', 'userid = :uid', ['uid' => $USER->id]);
+        if (!empty($agent_depts)) {
+            list($insql, $inparams) = $DB->get_in_or_equal($agent_depts, SQL_PARAMS_NAMED, 'dept');
+            // Can see own tickets, or general tickets (departmentid IS NULL), or tickets in their departments
+            $sqlwhere .= " AND (t.userid = :userid OR t.departmentid IS NULL OR t.departmentid $insql)";
+            $params['userid'] = $USER->id;
+            $params = array_merge($params, $inparams);
+        } else {
+            $sqlwhere .= ' AND t.userid = :userid';
+            $params['userid'] = $USER->id;
+        }
+    } else {
+        $sqlwhere .= ' AND t.userid = :userid';
+        $params['userid'] = $USER->id;
+    }
 }
 if ($filterstatus >= 0) {
     $sqlwhere .= ' AND t.status = :status';

@@ -35,13 +35,15 @@ $ticket = \local_aurasupport\ticket::get_by_id($id);
 $context = context_system::instance();
 require_login();
 
-if (!is_siteadmin() && $ticket->userid != $USER->id) {
+$is_agent_for_this = \local_aurasupport\ticket::is_agent_for_ticket($USER->id, $ticket);
+
+if (!is_siteadmin() && $ticket->userid != $USER->id && !$is_agent_for_this) {
     print_error('nopermissions', 'error', '', 'view this ticket');
 }
 
 $draft_text = '';
 $action = optional_param('action', '', PARAM_ALPHA);
-if ($action === 'generate_ai' && is_siteadmin() && \local_aurasupport\ai_manager::is_enabled()) {
+if ($action === 'generate_ai' && (is_siteadmin() || $is_agent_for_this) && \local_aurasupport\ai_manager::is_enabled()) {
     $messages = \local_aurasupport\ticket::get_messages($id);
     $history = '';
     foreach ($messages as $m) {
@@ -63,7 +65,7 @@ if ($draft_text) {
 
 $statusform = null;
 $reassignform = null;
-if (is_siteadmin()) {
+if (is_siteadmin() || $is_agent_for_this) {
     // Status Form
     $statusform = new \local_aurasupport\form\status_form(null, ['ticketid' => $id]);
     $statusform->set_data(['status' => $ticket->status]);
@@ -195,7 +197,7 @@ echo html_writer::start_tag('div', ['class' => 'local_aurasupport-card mb-4']);
 echo html_writer::tag('div', get_string('reply', 'local_aurasupport'), ['class' => 'card-header']);
 echo html_writer::start_tag('div', ['class' => 'card-body']);
 
-if (is_siteadmin() && \local_aurasupport\ai_manager::is_enabled()) {
+if ((is_siteadmin() || $is_agent_for_this) && \local_aurasupport\ai_manager::is_enabled()) {
     $ai_url = new moodle_url('/local/aurasupport/view.php', ['id' => $id, 'action' => 'generate_ai']);
     echo html_writer::link($ai_url, '✨ Draft Response with Gemini AI', ['class' => 'btn btn-outline-primary mb-3']);
 }

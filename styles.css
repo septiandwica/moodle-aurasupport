@@ -9,17 +9,16 @@
     --aura-border: #e3e6f0;
     --aura-text-main: #5a5c69;
     --aura-text-muted: #858796;
-    --aura-radius: 0.5rem;
+    --aura-radius: 0.25rem;
     --aura-chat-user: #f8f9fc;
     --aura-chat-admin: #e8f0fe;
 }
 
 /* Premium Layout Wrappers */
 .local_aurasupport-container {
-    background-color: var(--aura-bg-light);
+    background-color: #ffffff;
     border-radius: var(--aura-radius);
-    padding: 1.5rem;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    padding: 2rem;
     border: 1px solid var(--aura-border);
 }
 
@@ -85,7 +84,7 @@
 
 .local_aurasupport-bubble {
     padding: 1rem 1.25rem;
-    border-radius: 1.25rem;
+    border-radius: var(--aura-radius);
     font-size: 0.95rem;
     line-height: 1.5;
     position: relative;
@@ -152,7 +151,7 @@
     background: white;
     border-radius: var(--aura-radius);
     padding: 1.5rem;
-    box-shadow: var(--aura-card-shadow);
+    border: 1px solid var(--aura-border);
 }
 
 table.dataTable {
