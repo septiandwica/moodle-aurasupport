@@ -253,13 +253,13 @@ document.addEventListener('DOMContentLoaded', function() {
             var inputWrapper = document.querySelector('.aurasupport-chat-input-wrapper');
             var closedNotice = document.getElementById('aurasupport-widget-closed-notice');
             
-            if (status == 2) {
+            if (status == 2 || status == 3) {
                 inputWrapper.style.display = 'none';
                 if (!closedNotice) {
                     var notice = document.createElement('div');
                     notice.id = 'aurasupport-widget-closed-notice';
                     notice.className = 'text-center text-muted p-2';
-                    notice.innerHTML = '<small><i class="fa fa-lock"></i> Ticket is resolved. Chat is closed.</small>';
+                    notice.innerHTML = '<small><i class="fa fa-lock"></i> Ticket is resolved/closed. Chat is closed.</small>';
                     inputWrapper.parentNode.appendChild(notice);
                 } else {
                     closedNotice.style.display = 'block';

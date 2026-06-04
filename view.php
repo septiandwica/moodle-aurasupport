@@ -111,7 +111,7 @@ if (is_siteadmin() || $is_agent_for_this) {
 if ($mform->is_cancelled()) {
     redirect(new moodle_url('/local/aurasupport/view.php', ['id' => $id]));
 } else if ($data = $mform->get_data()) {
-    if ($ticket->status != 2) {
+    if ($ticket->status != 2 && $ticket->status != 3) {
         $msgid = \local_aurasupport\ticket::add_message($id, $USER->id, $data->message);
         
         // Save attachments
@@ -238,7 +238,7 @@ require(['jquery'], function($) {
 $PAGE->requires->js_amd_inline($js);
 
 // Reply Section
-if ($ticket->status != 2) {
+if ($ticket->status != 2 && $ticket->status != 3) {
     echo html_writer::start_tag('div', ['class' => 'local_aurasupport-card mb-4']);
     echo html_writer::tag('div', get_string('reply', 'local_aurasupport'), ['class' => 'card-header']);
     echo html_writer::start_tag('div', ['class' => 'card-body']);
@@ -254,7 +254,7 @@ if ($ticket->status != 2) {
 } else {
     echo html_writer::start_tag('div', ['class' => 'alert alert-secondary text-center mb-4', 'role' => 'alert']);
     echo html_writer::tag('i', '', ['class' => 'fa fa-lock mr-2']);
-    echo html_writer::tag('strong', 'This ticket has been resolved and is closed to new replies.');
+    echo html_writer::tag('strong', 'This ticket has been resolved/closed and is closed to new replies.');
     echo html_writer::end_tag('div');
 }
 

@@ -121,8 +121,8 @@ if ($action === 'widget_send_reply') {
     require_sesskey();
     $message = optional_param('message', '', PARAM_TEXT);
     
-    if ($ticket->status == 2) {
-        echo json_encode(['error' => 'This ticket is already resolved.']);
+    if ($ticket->status == 2 || $ticket->status == 3) {
+        echo json_encode(['error' => 'This ticket is already resolved or closed.']);
         die();
     }
     
