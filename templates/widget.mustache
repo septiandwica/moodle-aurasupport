@@ -2,7 +2,7 @@
 <div id="aurasupport-widget-container" class="aurasupport-widget-closed">
     <!-- Floating Button -->
     <button id="aurasupport-widget-btn" class="aurasupport-floating-btn" aria-label="Open AuraSupport">
-        <i class="fa fa-life-ring"></i>
+        <i class="fa fa-question-circle"></i>
     </button>
 
     <!-- Widget Panel -->
@@ -10,7 +10,7 @@
         <!-- Header -->
         <div class="aurasupport-widget-header bg-primary text-white">
             <div class="aurasupport-widget-header-top">
-                <h5 class="m-0 font-weight-bold" id="aurasupport-widget-title" style="font-size: 1.1rem;"><i class="fa fa-life-ring mr-2"></i> AuraSupport</h5>
+                <h5 class="m-0 font-weight-bold" id="aurasupport-widget-title" style="font-size: 1.1rem;"><i class="fa fa-question-circle mr-2"></i> AuraSupport</h5>
                 <div>
                     <a href="{{wwwroot}}/local/aurasupport/tickets.php" target="_blank" class="text-white mr-3" title="View Full Dashboard" style="opacity: 0.8; transition: 0.2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.8"><i class="fa fa-external-link"></i></a>
                     <button id="aurasupport-widget-close" class="btn btn-sm btn-link text-white p-0" style="opacity: 0.8; transition: 0.2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.8"><i class="fa fa-times fa-lg"></i></button>
@@ -142,7 +142,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Close it
             container.classList.add('aurasupport-widget-closed');
             container.classList.remove('aurasupport-widget-open');
-            btnOpenIcon.className = 'fa fa-life-ring';
+            btnOpenIcon.className = 'fa fa-question-circle';
         } else {
             // Open it
             container.classList.remove('aurasupport-widget-closed');
