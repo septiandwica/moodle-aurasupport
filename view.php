@@ -42,7 +42,7 @@ if (!is_siteadmin() && $ticket->userid != $USER->id && !$is_agent_for_this) {
 }
 
 $draft_text = '';
-$action = optional_param('action', '', PARAM_ALPHA);
+$action = optional_param('action', '', PARAM_ALPHANUMEXT);
 if ($action === 'generate_ai' && (is_siteadmin() || $is_agent_for_this) && \local_aurasupport\ai_manager::is_enabled()) {
     $messages = \local_aurasupport\ticket::get_messages($id);
     $history = '';
