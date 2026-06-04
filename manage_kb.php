@@ -59,6 +59,7 @@ if ($mform->is_cancelled()) {
 }
 
 echo $OUTPUT->header();
+local_aurasupport_print_tabs('kb');
 
 $articles = $DB->get_records('local_aurasupport_kb', null, 'timecreated DESC');
 if (!empty($articles)) {

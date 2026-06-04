@@ -37,6 +37,7 @@ $PAGE->set_title('Knowledge Base');
 $PAGE->set_heading('Knowledge Base');
 
 echo $OUTPUT->header();
+local_aurasupport_print_tabs('kb');
 
 echo html_writer::start_tag('div', ['class' => 'jumbotron local_aurasupport-header']);
 echo html_writer::tag('h1', 'How can we help you today?');

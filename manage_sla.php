@@ -63,6 +63,7 @@ if ($mform->is_cancelled()) {
 }
 
 echo $OUTPUT->header();
+local_aurasupport_print_tabs('sla');
 
 $slas = $DB->get_records('local_aurasupport_sla', null, 'priority ASC');
 if (!empty($slas)) {

@@ -68,6 +68,7 @@ if ($mform->is_cancelled()) {
 }
 
 echo $OUTPUT->header();
+local_aurasupport_print_tabs('agents');
 
 $sql = "SELECT a.id, u.firstname, u.lastname, u.email, d.name AS deptname 
         FROM {local_aurasupport_agents} a

@@ -26,6 +26,7 @@ $string['pluginname'] = 'AuraSupport (Helpdesk & BI)';
 $string['aurasupport:view'] = 'View AuraSupport dashboard';
 $string['aurasupport:manage'] = 'Manage all tickets (Agent/Admin)';
 $string['aurasupport:createticket'] = 'Create new tickets';
+$string['createticket'] = 'Create New Ticket';
 $string['subject'] = 'Subject';
 $string['description'] = 'Description';
 $string['priority'] = 'Priority';

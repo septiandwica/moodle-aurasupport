@@ -38,6 +38,7 @@ $PAGE->set_heading(get_string('dashboard', 'local_aurasupport'));
 $PAGE->requires->js(new moodle_url('https://cdn.jsdelivr.net/npm/apexcharts'));
 
 echo $OUTPUT->header();
+local_aurasupport_print_tabs('dashboard');
 
 $stats = \local_aurasupport\analytics::get_summary_stats();
 $chartdata = \local_aurasupport\analytics::get_chart_data();

@@ -63,3 +63,59 @@ function local_aurasupport_extend_navigation_user(navigation_node $parent) {
         );
     }
 }
+
+/**
+ * Print tabbed navigation for AuraSupport pages.
+ */
+function local_aurasupport_print_tabs($current_tab = 'tickets') {
+    global $CFG;
+
+    $tabs = [];
+    $tabs[] = [
+        'id' => 'tickets',
+        'name' => 'Tickets',
+        'url' => new moodle_url('/local/aurasupport/tickets.php')
+    ];
+    $tabs[] = [
+        'id' => 'kb',
+        'name' => 'Knowledge Base',
+        'url' => new moodle_url('/local/aurasupport/kb.php')
+    ];
+
+    if (has_capability('local/aurasupport:manage', context_system::instance())) {
+        $tabs[] = [
+            'id' => 'dashboard',
+            'name' => 'BI Dashboard',
+            'url' => new moodle_url('/local/aurasupport/index.php')
+        ];
+        $tabs[] = [
+            'id' => 'departments',
+            'name' => 'Departments',
+            'url' => new moodle_url('/local/aurasupport/manage_depts.php')
+        ];
+        $tabs[] = [
+            'id' => 'agents',
+            'name' => 'Agents',
+            'url' => new moodle_url('/local/aurasupport/manage_agents.php')
+        ];
+        $tabs[] = [
+            'id' => 'sla',
+            'name' => 'SLA Rules',
+            'url' => new moodle_url('/local/aurasupport/manage_sla.php')
+        ];
+        $tabs[] = [
+            'id' => 'settings',
+            'name' => 'Settings',
+            'url' => new moodle_url('/admin/settings.php', ['section' => 'local_aurasupport'])
+        ];
+    }
+
+    echo \html_writer::start_tag('ul', ['class' => 'nav nav-tabs mb-4']);
+    foreach ($tabs as $tab) {
+        $active = ($tab['id'] === $current_tab) ? ' active font-weight-bold' : '';
+        echo \html_writer::start_tag('li', ['class' => 'nav-item']);
+        echo \html_writer::link($tab['url'], $tab['name'], ['class' => 'nav-link' . $active]);
+        echo \html_writer::end_tag('li');
+    }
+    echo \html_writer::end_tag('ul');
+}

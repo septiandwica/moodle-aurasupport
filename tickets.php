@@ -57,6 +57,7 @@ if ($mform->is_cancelled()) {
 }
 
 echo $OUTPUT->header();
+local_aurasupport_print_tabs('tickets');
 
 // Filters UI
 echo html_writer::start_tag('div', ['class' => 'well box p-3 mb-4 bg-light border rounded']);
