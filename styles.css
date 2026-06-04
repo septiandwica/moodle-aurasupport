@@ -387,3 +387,56 @@ table.dataTable tbody tr:hover {
 .aurasupport-chat-attach-btn:hover {
     color: var(--aura-primary);
 }
+
+/* Widget Create Ticket Form Styles */
+.aurasupport-widget-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--aura-text-main);
+    margin-bottom: 6px;
+    display: block;
+}
+
+.aurasupport-widget-input {
+    background-color: var(--aura-primary-light);
+    border: 1px solid transparent;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 0.9rem;
+    color: var(--aura-text-main);
+    width: 100%;
+    transition: all 0.2s ease-in-out;
+    box-sizing: border-box;
+    display: block;
+}
+
+.aurasupport-widget-input:focus {
+    outline: none;
+    background-color: white;
+    border-color: var(--aura-primary);
+    box-shadow: 0 0 0 3px rgba(78, 115, 223, 0.15);
+}
+
+.aurasupport-submit-btn {
+    background-color: var(--aura-primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.aurasupport-submit-btn:hover {
+    background-color: #3b5bbf;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(78, 115, 223, 0.3);
+}
+
+.aurasupport-submit-btn:active {
+    transform: translateY(0);
+    box-shadow: none;
+}

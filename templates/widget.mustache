@@ -72,32 +72,32 @@
                 <span class="font-weight-bold ml-2">Create Ticket</span>
             </div>
             <div class="p-3" style="overflow-y:auto; flex:1;">
-                <div class="form-group mb-2">
-                    <label class="mb-0"><small>Subject</small></label>
-                    <input type="text" id="aurasupport-widget-new-subject" class="form-control form-control-sm" required>
+                <div class="mb-3">
+                    <label class="aurasupport-widget-label">Subject</label>
+                    <input type="text" id="aurasupport-widget-new-subject" class="aurasupport-widget-input" required>
                 </div>
-                <div class="form-group mb-2">
-                    <label class="mb-0"><small>Department</small></label>
-                    <select id="aurasupport-widget-new-dept" class="form-control form-control-sm" required>
+                <div class="mb-3">
+                    <label class="aurasupport-widget-label">Department</label>
+                    <select id="aurasupport-widget-new-dept" class="aurasupport-widget-input" required>
                         <option value="">Select a department...</option>
                         {{#departments}}
                             <option value="{{id}}">{{name}}</option>
                         {{/departments}}
                     </select>
                 </div>
-                <div class="form-group mb-2">
-                    <label class="mb-0"><small>Priority</small></label>
-                    <select id="aurasupport-widget-new-priority" class="form-control form-control-sm" required>
+                <div class="mb-3">
+                    <label class="aurasupport-widget-label">Priority</label>
+                    <select id="aurasupport-widget-new-priority" class="aurasupport-widget-input" required>
                         {{#priorities}}
                             <option value="{{id}}" {{#is_normal}}selected{{/is_normal}}>{{name}}</option>
                         {{/priorities}}
                     </select>
                 </div>
-                <div class="form-group mb-3">
-                    <label class="mb-0"><small>Description</small></label>
-                    <textarea id="aurasupport-widget-new-desc" class="form-control form-control-sm" rows="3" required></textarea>
+                <div class="mb-4">
+                    <label class="aurasupport-widget-label">Description</label>
+                    <textarea id="aurasupport-widget-new-desc" class="aurasupport-widget-input" rows="4" required></textarea>
                 </div>
-                <button id="aurasupport-widget-btn-submit" class="btn btn-sm btn-primary w-100">Submit Ticket</button>
+                <button id="aurasupport-widget-btn-submit" class="aurasupport-submit-btn w-100">Submit Ticket</button>
             </div>
         </div>
         
