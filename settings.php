@@ -64,8 +64,8 @@ if ($hassiteconfig) {
     
     $settings->add(new admin_setting_configtext('local_aurasupport/widget_footer_text',
         'Widget Footer Text',
-        'Text displayed at the bottom of the support widget (e.g. version info).',
-        'AuraSupport v1.0.0', PARAM_TEXT));
+        'Text displayed at the bottom of the support widget. Use {{version}} to automatically insert the plugin version.',
+        'AuraSupport {{version}}', PARAM_TEXT));
         
     $ADMIN->add('localplugins', $settings);
 }

@@ -130,9 +130,18 @@ function local_aurasupport_before_footer() {
         ['id' => 3, 'name' => 'Urgent', 'is_normal' => false]
     ];
 
+    // Get plugin release version
+    $pluginman = \core_plugin_manager::instance();
+    $plugininfo = $pluginman->get_plugin_info('local_aurasupport');
+    $version_text = $plugininfo ? $plugininfo->release : 'v1.0.0';
+    
+    // Check if user has overridden the footer text in settings
     $footer_text = get_config('local_aurasupport', 'widget_footer_text');
-    if ($footer_text === false) {
-        $footer_text = 'AuraSupport v1.0.0';
+    if ($footer_text === false || trim($footer_text) === '') {
+        $footer_text = 'AuraSupport ' . $version_text;
+    } else {
+        // Allow placeholder {{version}} in the setting
+        $footer_text = str_replace('{{version}}', $version_text, $footer_text);
     }
 
     $template_data = [
