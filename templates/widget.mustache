@@ -1,3 +1,4 @@
+
 <div id="aurasupport-widget-container" class="aurasupport-widget-closed">
     <!-- Floating Button -->
     <button id="aurasupport-widget-btn" class="aurasupport-floating-btn" aria-label="Open AuraSupport">
@@ -52,14 +53,31 @@
                 <button id="aurasupport-widget-btn-back-create" class="btn btn-sm btn-light"><i class="fa fa-arrow-left"></i> Back</button>
                 <span class="font-weight-bold ml-2">Create Ticket</span>
             </div>
-            <div class="p-3">
-                <div class="form-group">
-                    <label>Subject</label>
+            <div class="p-3" style="overflow-y:auto; flex:1;">
+                <div class="form-group mb-2">
+                    <label class="mb-0"><small>Subject</small></label>
                     <input type="text" id="aurasupport-widget-new-subject" class="form-control form-control-sm" required>
                 </div>
-                <div class="form-group">
-                    <label>Description</label>
-                    <textarea id="aurasupport-widget-new-desc" class="form-control form-control-sm" rows="4" required></textarea>
+                <div class="form-group mb-2">
+                    <label class="mb-0"><small>Department</small></label>
+                    <select id="aurasupport-widget-new-dept" class="form-control form-control-sm" required>
+                        <option value="">Select a department...</option>
+                        {{#departments}}
+                            <option value="{{id}}">{{name}}</option>
+                        {{/departments}}
+                    </select>
+                </div>
+                <div class="form-group mb-2">
+                    <label class="mb-0"><small>Priority</small></label>
+                    <select id="aurasupport-widget-new-priority" class="form-control form-control-sm" required>
+                        {{#priorities}}
+                            <option value="{{id}}" {{#is_normal}}selected{{/is_normal}}>{{name}}</option>
+                        {{/priorities}}
+                    </select>
+                </div>
+                <div class="form-group mb-3">
+                    <label class="mb-0"><small>Description</small></label>
+                    <textarea id="aurasupport-widget-new-desc" class="form-control form-control-sm" rows="3" required></textarea>
                 </div>
                 <button id="aurasupport-widget-btn-submit" class="btn btn-sm btn-primary w-100">Submit Ticket</button>
             </div>
@@ -225,10 +243,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // Create Ticket
     document.getElementById('aurasupport-widget-btn-submit').addEventListener('click', function() {
         var subject = document.getElementById('aurasupport-widget-new-subject').value.trim();
+        var dept = document.getElementById('aurasupport-widget-new-dept').value;
+        var priority = document.getElementById('aurasupport-widget-new-priority').value;
         var desc = document.getElementById('aurasupport-widget-new-desc').value.trim();
         
-        if (!subject || !desc) {
-            alert('Please fill in both fields.');
+        if (!subject || !desc || !dept) {
+            alert('Please fill in all required fields (Subject, Department, and Description).');
             return;
         }
         
@@ -236,7 +256,7 @@ document.addEventListener('DOMContentLoaded', function() {
         btn.disabled = true;
         btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Submitting...';
         
-        apiCall('widget_create_ticket', { subject: subject, description: desc }, function(res) {
+        apiCall('widget_create_ticket', { subject: subject, department: dept, priority: priority, description: desc }, function(res) {
             btn.disabled = false;
             btn.innerHTML = 'Submit Ticket';
             if (res.success) {

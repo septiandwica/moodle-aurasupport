@@ -43,14 +43,17 @@ if ($action === 'widget_get_tickets') {
 if ($action === 'widget_create_ticket') {
     require_sesskey();
     $subject = required_param('subject', PARAM_TEXT);
+    $dept = required_param('department', PARAM_INT);
+    $priority = required_param('priority', PARAM_INT);
     $desc = required_param('description', PARAM_TEXT);
     
     $ticket = new \stdClass();
     $ticket->userid = $USER->id;
+    $ticket->departmentid = $dept;
     $ticket->subject = $subject;
     $ticket->description = $desc;
     $ticket->status = 0;
-    $ticket->priority = 1;
+    $ticket->priority = $priority;
     
     $id = \local_aurasupport\ticket::create($ticket);
     if ($id) {

@@ -114,6 +114,29 @@ function local_aurasupport_before_footer() {
         // Actually, we'll just show it.
     }
     
+    global $DB;
+    // Fetch departments for the ticket creation form
+    $depts = $DB->get_records('local_aurasupport_depts', null, 'name ASC');
+    $dept_arr = [];
+    foreach ($depts as $d) {
+        $dept_arr[] = ['id' => $d->id, 'name' => $d->name];
+    }
+    
+    // Priorities
+    $priorities = [
+        ['id' => 0, 'name' => 'Low', 'is_normal' => false],
+        ['id' => 1, 'name' => 'Normal', 'is_normal' => true],
+        ['id' => 2, 'name' => 'High', 'is_normal' => false],
+        ['id' => 3, 'name' => 'Urgent', 'is_normal' => false]
+    ];
+
+    $template_data = [
+        'wwwroot' => $CFG->wwwroot,
+        'sesskey' => sesskey(),
+        'departments' => $dept_arr,
+        'priorities' => $priorities
+    ];
+
     // Render the widget template
-    return $OUTPUT->render_from_template('local_aurasupport/widget', ['wwwroot' => $CFG->wwwroot, 'sesskey' => sesskey()]);
+    return $OUTPUT->render_from_template('local_aurasupport/widget', $template_data);
 }
