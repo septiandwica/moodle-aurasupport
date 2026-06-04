@@ -32,7 +32,7 @@ defined('MOODLE_INTERNAL') || die();
 function local_aurasupport_extend_navigation_user(navigation_node $parent) {
     if (isloggedin() && !isguestuser()) {
         $parent->add(
-            get_string('pluginname', 'local_aurasupport') . ' (Helpdesk)', 
+            'AuraSupport', 
             new moodle_url('/local/aurasupport/tickets.php'), 
             navigation_node::TYPE_CUSTOM, 
             null, 
