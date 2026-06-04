@@ -440,3 +440,23 @@ table.dataTable tbody tr:hover {
     transform: translateY(0);
     box-shadow: none;
 }
+
+/* Responsive Widget for Mobile Devices */
+@media screen and (max-width: 576px) {
+    .aurasupport-widget-panel {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0 !important;
+        right: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        max-height: 100vh !important;
+        border-radius: 0;
+        border: none;
+        z-index: 99999;
+    }
+    .aurasupport-widget-open .aurasupport-floating-btn {
+        display: none; /* Hide the floating button on mobile when the widget is open */
+    }
+}
