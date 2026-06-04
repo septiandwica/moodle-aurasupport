@@ -255,7 +255,7 @@ table.dataTable tbody tr:hover {
     width: 420px;
     height: 600px;
     background: white;
-    border-radius: var(--aura-radius);
+    border-radius: 16px;
     border: 1px solid var(--aura-border);
     box-shadow: 0 4px 15px rgba(0,0,0,0.1); /* Minimal shadow to detach from background */
     display: flex;
