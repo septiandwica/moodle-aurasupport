@@ -109,13 +109,22 @@ if ($action === 'widget_get_chat') {
             'is_mine' => ($msg->userid == $USER->id)
         ];
     }
-    echo json_encode(array_values($res));
+    $ticket = \local_aurasupport\ticket::get_by_id($ticketid);
+    echo json_encode([
+        'messages' => array_values($res),
+        'status' => $ticket->status
+    ]);
     die();
 }
 
 if ($action === 'widget_send_reply') {
     require_sesskey();
     $message = optional_param('message', '', PARAM_TEXT);
+    
+    if ($ticket->status == 2) {
+        echo json_encode(['error' => 'This ticket is already resolved.']);
+        die();
+    }
     
     // Create the message
     $msgid = \local_aurasupport\ticket::add_message($ticketid, $USER->id, ['text' => $message, 'format' => FORMAT_MOODLE]);

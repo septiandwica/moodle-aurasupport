@@ -111,13 +111,14 @@ if (is_siteadmin() || $is_agent_for_this) {
 if ($mform->is_cancelled()) {
     redirect(new moodle_url('/local/aurasupport/view.php', ['id' => $id]));
 } else if ($data = $mform->get_data()) {
-    $msgid = \local_aurasupport\ticket::add_message($id, $USER->id, $data->message);
-    
-    // Save attachments
-    if (!empty($data->attachments)) {
-        file_save_draft_area_files($data->attachments, $context->id, 'local_aurasupport', 'message_attachment', $msgid, ['subdirs' => 0, 'maxbytes' => 0, 'maxfiles' => 5]);
+    if ($ticket->status != 2) {
+        $msgid = \local_aurasupport\ticket::add_message($id, $USER->id, $data->message);
+        
+        // Save attachments
+        if (!empty($data->attachments)) {
+            file_save_draft_area_files($data->attachments, $context->id, 'local_aurasupport', 'message_attachment', $msgid, ['subdirs' => 0, 'maxbytes' => 0, 'maxfiles' => 5]);
+        }
     }
-    
     redirect(new moodle_url('/local/aurasupport/view.php', ['id' => $id]));
 }
 
@@ -237,18 +238,25 @@ require(['jquery'], function($) {
 $PAGE->requires->js_amd_inline($js);
 
 // Reply Section
-echo html_writer::start_tag('div', ['class' => 'local_aurasupport-card mb-4']);
-echo html_writer::tag('div', get_string('reply', 'local_aurasupport'), ['class' => 'card-header']);
-echo html_writer::start_tag('div', ['class' => 'card-body']);
+if ($ticket->status != 2) {
+    echo html_writer::start_tag('div', ['class' => 'local_aurasupport-card mb-4']);
+    echo html_writer::tag('div', get_string('reply', 'local_aurasupport'), ['class' => 'card-header']);
+    echo html_writer::start_tag('div', ['class' => 'card-body']);
 
-if ((is_siteadmin() || $is_agent_for_this) && \local_aurasupport\ai_manager::is_enabled()) {
-    $ai_url = new moodle_url('/local/aurasupport/view.php', ['id' => $id, 'action' => 'generate_ai']);
-    echo html_writer::link($ai_url, '✨ Draft Response with Gemini AI', ['class' => 'btn btn-outline-primary mb-3']);
+    if ((is_siteadmin() || $is_agent_for_this) && \local_aurasupport\ai_manager::is_enabled()) {
+        $ai_url = new moodle_url('/local/aurasupport/view.php', ['id' => $id, 'action' => 'generate_ai']);
+        echo html_writer::link($ai_url, '✨ Draft Response with Gemini AI', ['class' => 'btn btn-outline-primary mb-3']);
+    }
+
+    $mform->display();
+    echo html_writer::end_tag('div'); // End Card Body
+    echo html_writer::end_tag('div'); // End Card
+} else {
+    echo html_writer::start_tag('div', ['class' => 'alert alert-secondary text-center mb-4', 'role' => 'alert']);
+    echo html_writer::tag('i', '', ['class' => 'fa fa-lock mr-2']);
+    echo html_writer::tag('strong', 'This ticket has been resolved and is closed to new replies.');
+    echo html_writer::end_tag('div');
 }
-
-$mform->display();
-echo html_writer::end_tag('div'); // End Card Body
-echo html_writer::end_tag('div'); // End Card
 
 echo html_writer::link(new moodle_url('/local/aurasupport/tickets.php'), get_string('backtotickets', 'local_aurasupport'), ['class' => 'btn btn-secondary mt-3']);
 

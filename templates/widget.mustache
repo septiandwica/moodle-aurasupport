@@ -229,22 +229,45 @@ document.addEventListener('DOMContentLoaded', function() {
         
         chatMessages.innerHTML = '<div class="text-center text-muted py-3"><i class="fa fa-spinner fa-spin"></i> Loading...</div>';
         
-        apiCall('widget_get_chat', { ticketid: ticketId }, function(res) {
-            if (res.error) {
-                chatMessages.innerHTML = '<div class="text-danger p-2">' + res.error + '</div>';
-                return;
-            }
+        loadChat(ticketId);
+    }
+
+    function loadChat(id) {
+        apiCall('widget_get_chat', { ticketid: id }, function(res) {
+            var messages = res.messages || [];
+            var status = res.status;
+            
             var html = '';
-            res.forEach(function(m) {
-                var alignClass = m.is_mine ? 'text-right' : 'text-left';
-                var bgClass = m.is_mine ? 'bg-primary text-white' : 'bg-light border';
-                html += '<div class="mb-2 ' + alignClass + '">';
-                html += '<small class="d-block text-muted" style="font-size:0.7rem;">' + m.sender + ' &bull; ' + m.timeago + '</small>';
-                html += '<div class="d-inline-block p-2 rounded ' + bgClass + '" style="max-width:85%; text-align:left;">' + m.message + '</div>';
-                html += '</div>';
+            messages.forEach(function(m) {
+                var cls = m.is_mine ? 'my-message' : 'other-message';
+                html += '<div class="d-flex '+(m.is_mine?'justify-content-end':'')+' mb-2">';
+                html += '<div class="'+cls+' p-2 rounded" style="background:'+(m.is_mine?'#0d6efd':'#e9ecef')+'; color:'+(m.is_mine?'white':'black')+'; max-width:80%;">';
+                html += '<div>'+m.message+'</div>';
+                html += '<small style="opacity:0.7; font-size:10px;">'+m.sender+' • '+m.timeago+'</small>';
+                html += '</div></div>';
             });
             chatMessages.innerHTML = html;
             chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            // Hide input if resolved
+            var inputWrapper = document.querySelector('.aurasupport-chat-input-wrapper');
+            var closedNotice = document.getElementById('aurasupport-widget-closed-notice');
+            
+            if (status == 2) {
+                inputWrapper.classList.add('d-none');
+                if (!closedNotice) {
+                    var notice = document.createElement('div');
+                    notice.id = 'aurasupport-widget-closed-notice';
+                    notice.className = 'text-center text-muted p-2';
+                    notice.innerHTML = '<small><i class="fa fa-lock"></i> Ticket is resolved. Chat is closed.</small>';
+                    inputWrapper.parentNode.appendChild(notice);
+                } else {
+                    closedNotice.classList.remove('d-none');
+                }
+            } else {
+                inputWrapper.classList.remove('d-none');
+                if (closedNotice) closedNotice.classList.add('d-none');
+            }
         });
     }
     
