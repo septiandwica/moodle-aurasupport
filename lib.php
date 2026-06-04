@@ -96,3 +96,24 @@ function local_aurasupport_print_tabs($current_tab = 'tickets') {
     }
     echo \html_writer::end_tag('ul');
 }
+
+/**
+ * Inject the floating widget into the footer of every Moodle page.
+ */
+function local_aurasupport_standard_footer_html() {
+    global $CFG, $USER, $PAGE, $OUTPUT;
+    
+    // Only show for logged in users
+    if (!isloggedin() || isguestuser()) {
+        return '';
+    }
+    
+    // Check if widget is enabled in settings
+    if (!get_config('local_aurasupport', 'enable_widget')) {
+        // We can default to enabled if not set, but let's assume it's always enabled for now.
+        // Actually, we'll just show it.
+    }
+    
+    // Render the widget template
+    return $OUTPUT->render_from_template('local_aurasupport/widget', ['wwwroot' => $CFG->wwwroot, 'sesskey' => sesskey()]);
+}

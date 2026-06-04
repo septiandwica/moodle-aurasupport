@@ -20,9 +20,48 @@ require_once($CFG->dirroot . '/local/aurasupport/classes/ticket.php');
 
 require_login();
 
-$ticketid = required_param('ticketid', PARAM_INT);
-$lastmsgid = optional_param('lastmsgid', 0, PARAM_INT);
+$action = optional_param('action', '', PARAM_TEXT);
 
+if ($action === 'widget_get_tickets') {
+    global $DB;
+    // Get active/recent tickets for current user
+    $sql = "SELECT * FROM {local_aurasupport_tickets} WHERE userid = :userid ORDER BY timecreated DESC LIMIT 10";
+    $tickets = $DB->get_records_sql($sql, ['userid' => $USER->id]);
+    $res = [];
+    foreach ($tickets as $t) {
+        $res[] = [
+            'id' => $t->id,
+            'subject' => $t->subject,
+            'status' => $t->status,
+            'timeago' => get_string('ago', 'message', format_time(time() - $t->timecreated))
+        ];
+    }
+    echo json_encode(array_values($res));
+    die();
+}
+
+if ($action === 'widget_create_ticket') {
+    require_sesskey();
+    $subject = required_param('subject', PARAM_TEXT);
+    $desc = required_param('description', PARAM_TEXT);
+    
+    $ticket = new \stdClass();
+    $ticket->userid = $USER->id;
+    $ticket->subject = $subject;
+    $ticket->description = $desc;
+    $ticket->status = 0;
+    $ticket->priority = 1;
+    
+    $id = \local_aurasupport\ticket::create($ticket);
+    if ($id) {
+        echo json_encode(['success' => true]);
+    } else {
+        echo json_encode(['error' => 'Could not create ticket']);
+    }
+    die();
+}
+
+$ticketid = required_param('ticketid', PARAM_INT);
 $ticket = \local_aurasupport\ticket::get_by_id($ticketid);
 if (!$ticket) {
     echo json_encode(['error' => 'Invalid ticket']);
@@ -35,6 +74,38 @@ if (!is_siteadmin() && $ticket->userid != $USER->id && !$is_agent_for_this) {
     die();
 }
 
+if ($action === 'widget_get_chat') {
+    global $DB;
+    $sql = "SELECT m.*, u.firstname, u.lastname 
+            FROM {local_aurasupport_messages} m
+            JOIN {user} u ON m.userid = u.id
+            WHERE m.ticketid = :ticketid
+            ORDER BY m.timecreated ASC";
+    $messages = $DB->get_records_sql($sql, ['ticketid' => $ticketid]);
+    $res = [];
+    foreach ($messages as $msg) {
+        $res[] = [
+            'id' => $msg->id,
+            'sender' => fullname($msg),
+            'message' => format_text($msg->message),
+            'timeago' => get_string('ago', 'message', format_time(time() - $msg->timecreated)),
+            'is_mine' => ($msg->userid == $USER->id)
+        ];
+    }
+    echo json_encode(array_values($res));
+    die();
+}
+
+if ($action === 'widget_send_reply') {
+    require_sesskey();
+    $message = required_param('message', PARAM_TEXT);
+    \local_aurasupport\ticket::add_message($ticketid, $USER->id, $message);
+    echo json_encode(['success' => true]);
+    die();
+}
+
+// Default action: Long-polling (Backward compatibility for view.php)
+$lastmsgid = optional_param('lastmsgid', 0, PARAM_INT);
 global $DB;
 $sql = "SELECT m.*, u.firstname, u.lastname 
         FROM {local_aurasupport_messages} m

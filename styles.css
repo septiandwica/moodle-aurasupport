@@ -216,3 +216,96 @@ table.dataTable tbody tr:hover {
     margin-bottom: 0.5rem;
     opacity: 0.9;
 }
+
+/* AuraSupport Floating Widget Styles */
+#aurasupport-widget-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 9999;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+.aurasupport-floating-btn {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #0d6efd;
+    color: white;
+    border: none;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    font-size: 24px;
+    cursor: pointer;
+    transition: transform 0.2s, background-color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.aurasupport-floating-btn:hover {
+    transform: scale(1.05);
+    background-color: #0b5ed7;
+}
+
+.aurasupport-widget-panel {
+    position: absolute;
+    bottom: 80px;
+    right: 0;
+    width: 350px;
+    height: 500px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: opacity 0.3s, transform 0.3s;
+    opacity: 0;
+    transform: translateY(20px);
+    pointer-events: none;
+}
+
+.aurasupport-widget-open .aurasupport-widget-panel {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.aurasupport-widget-open .aurasupport-floating-btn {
+    display: none;
+}
+
+.aurasupport-widget-header {
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #0d6efd;
+    color: white;
+}
+
+.aurasupport-widget-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.aurasupport-widget-list {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.aurasupport-widget-ticket-item:hover {
+    background-color: #f8f9fa;
+}
+
+.aurasupport-widget-chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    background-color: #f8f9fa;
+}
+
+.d-none {
+    display: none !important;
+}
