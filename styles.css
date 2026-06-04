@@ -227,14 +227,15 @@ table.dataTable tbody tr:hover {
 }
 
 .aurasupport-floating-btn {
-    width: 60px;
-    height: 60px;
+    width: 65px;
+    height: 65px;
     border-radius: 50%;
-    background-color: #0d6efd;
+    background-color: var(--aura-primary);
+    background-image: none !important; /* Strictly no gradients */
     color: white;
     border: none;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-    font-size: 24px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.15); /* Minimal shadow for flat design */
+    font-size: 26px;
     cursor: pointer;
     transition: transform 0.2s, background-color 0.2s;
     display: flex;
@@ -244,18 +245,19 @@ table.dataTable tbody tr:hover {
 
 .aurasupport-floating-btn:hover {
     transform: scale(1.05);
-    background-color: #0b5ed7;
+    background-color: #3b5bbf; /* Darker flat color */
 }
 
 .aurasupport-widget-panel {
     position: absolute;
-    bottom: 80px;
+    bottom: 85px;
     right: 0;
-    width: 350px;
-    height: 500px;
+    width: 420px;
+    height: 600px;
     background: white;
-    border-radius: 12px;
-    box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+    border-radius: var(--aura-radius);
+    border: 1px solid var(--aura-border);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1); /* Minimal shadow to detach from background */
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -280,7 +282,8 @@ table.dataTable tbody tr:hover {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: #0d6efd;
+    background-color: var(--aura-primary) !important;
+    background-image: none !important; /* Strictly no gradients */
     color: white;
 }
 
