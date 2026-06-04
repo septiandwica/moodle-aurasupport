@@ -98,8 +98,13 @@
         
         <!-- Widget Footer -->
         {{#footer_text}}
-        <div class="aurasupport-widget-footer text-center p-1" style="background-color: #f8f9fc; border-top: 1px solid var(--aura-border); font-size: 0.65rem; color: #858796;">
-            {{{footer_text}}}
+        <div class="aurasupport-widget-footer text-center p-1 pb-2" style="background-color: #f8f9fc; border-top: 1px solid var(--aura-border); font-size: 0.65rem; color: #858796;">
+            <div>{{{footer_text}}}</div>
+            <div style="margin-top: 2px;">
+                <a href="https://samastanuswantara.com" target="_blank" style="color: #b7b9cc; text-decoration: none; font-size: 0.55rem; opacity: 0.5; transition: 0.3s;" onmouseover="this.style.opacity=1; this.style.color='#4e73df';" onmouseout="this.style.opacity=0.5; this.style.color='#b7b9cc';" title="Developed by Tateta">
+                    <i class="fa fa-bolt"></i> power by tateta
+                </a>
+            </div>
         </div>
         {{/footer_text}}
     </div>
