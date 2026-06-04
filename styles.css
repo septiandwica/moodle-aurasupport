@@ -274,7 +274,8 @@ table.dataTable tbody tr:hover {
 }
 
 .aurasupport-widget-open .aurasupport-floating-btn {
-    display: none;
+    /* Kept visible per user request, can optionally transform it into a close icon later */
+    opacity: 1;
 }
 
 .aurasupport-widget-header {

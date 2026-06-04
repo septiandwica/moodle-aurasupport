@@ -104,16 +104,28 @@ document.addEventListener('DOMContentLoaded', function() {
     var ticketsList = document.getElementById('aurasupport-widget-tickets-list');
     var chatMessages = document.getElementById('aurasupport-widget-chat-messages');
     
+    var btnOpenIcon = btnOpen.querySelector('i');
+    
     // Toggle Widget
     btnOpen.addEventListener('click', function() {
-        container.classList.remove('aurasupport-widget-closed');
-        container.classList.add('aurasupport-widget-open');
-        showList();
+        if (container.classList.contains('aurasupport-widget-open')) {
+            // Close it
+            container.classList.add('aurasupport-widget-closed');
+            container.classList.remove('aurasupport-widget-open');
+            btnOpenIcon.className = 'fa fa-life-ring';
+        } else {
+            // Open it
+            container.classList.remove('aurasupport-widget-closed');
+            container.classList.add('aurasupport-widget-open');
+            btnOpenIcon.className = 'fa fa-times';
+            showList();
+        }
     });
     
     btnClose.addEventListener('click', function() {
         container.classList.add('aurasupport-widget-closed');
         container.classList.remove('aurasupport-widget-open');
+        btnOpenIcon.className = 'fa fa-life-ring';
     });
     
     // Navigation
