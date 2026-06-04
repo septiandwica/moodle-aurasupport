@@ -24,7 +24,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2026060403;
+$plugin->version   = 2026060404;
 $plugin->requires  = 2020041500;
 $plugin->component = 'local_aurasupport'; // Full name of the plugin.
 $plugin->maturity  = MATURITY_ALPHA;
