@@ -28,7 +28,7 @@ function xmldb_local_aurasupport_upgrade($oldversion) {
     global $DB;
     $dbman = $DB->get_manager();
 
-    if ($oldversion < 2026060301) {
+    if ($oldversion < 2026060401) {
         $table = new xmldb_table('local_aurasupport_tickets');
         $field = new xmldb_field('courseid', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'userid');
 
@@ -36,7 +36,7 @@ function xmldb_local_aurasupport_upgrade($oldversion) {
             $dbman->add_field($table, $field);
         }
 
-        upgrade_plugin_savepoint(true, 2026060301, 'local', 'aurasupport');
+        upgrade_plugin_savepoint(true, 2026060401, 'local', 'aurasupport');
     }
 
     return true;
