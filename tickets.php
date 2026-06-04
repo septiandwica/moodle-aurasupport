@@ -118,7 +118,7 @@ $priority_map = [
     0 => 'Low', 1 => 'Medium', 2 => 'High', 3 => 'Urgent'
 ];
 
-echo html_writer::start_tag('div', ['class' => 'local_aurasupport-table-wrapper']);
+echo html_writer::start_tag('div', ['class' => 'local_aurasupport-table-wrapper table-responsive']);
 echo '<table id="ticketstable" class="table table-hover" style="width:100%">';
 echo '<thead><tr>
         <th>ID</th>
@@ -171,8 +171,12 @@ require.config({
 require(['jquery', 'datatables.net', 'datatables.net-bs4', 'datatables.net-buttons', 'datatables.net-buttons-html5', 'datatables.net-buttons-print'], function($) {
     $(document).ready(function() {
         $('#ticketstable').DataTable({
-            dom: 'Bfrtip',
-            buttons: ['copy', 'csv', 'print'],
+            dom: '<"row"<"col-sm-12 col-md-6"B><"col-sm-12 col-md-6"f>>rt<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
+            buttons: [
+                { extend: 'copy', className: 'btn btn-outline-secondary btn-sm mr-1' },
+                { extend: 'csv', className: 'btn btn-outline-success btn-sm mr-1' },
+                { extend: 'print', className: 'btn btn-outline-info btn-sm' }
+            ],
             order: [[7, 'desc']],
             language: { search: 'Live Search:' }
         });
@@ -181,7 +185,7 @@ require(['jquery', 'datatables.net', 'datatables.net-bs4', 'datatables.net-butto
 ";
 $PAGE->requires->js_amd_inline($js);
 
-echo html_writer::tag('hr', ['class' => 'mt-5 mb-4']);
+echo html_writer::empty_tag('hr', ['class' => 'mt-5 mb-4']);
 echo html_writer::tag('h3', get_string('createticket', 'local_aurasupport'), ['class' => 'mb-4']);
 $mform->display();
 

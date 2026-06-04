@@ -147,8 +147,6 @@
 .local_aurasupport-filter-bar {
     background: white;
     padding: 1rem 1.5rem;
-    border-radius: 50rem;
-    box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075);
     margin-bottom: 2rem;
     border: 1px solid var(--aura-border);
     display: flex;
@@ -193,13 +191,7 @@ table.dataTable tbody tr:hover {
     letter-spacing: 0.5px;
 }
 
-/* Gradients for Dashboard */
-.bg-gradient-primary { background: linear-gradient(135deg, #4e73df 0%, #224abe 100%); color: white;}
-.bg-gradient-warning { background: linear-gradient(135deg, #f6c23e 0%, #dda20a 100%); color: white;}
-.bg-gradient-success { background: linear-gradient(135deg, #1cc88a 0%, #13855c 100%); color: white;}
-.bg-gradient-secondary { background: linear-gradient(135deg, #858796 0%, #60616f 100%); color: white;}
-.bg-gradient-danger { background: linear-gradient(135deg, #e74a3b 0%, #be2617 100%); color: white;}
-.bg-gradient-info { background: linear-gradient(135deg, #36b9cc 0%, #258391 100%); color: white;}
+/* Removed gradients for a cleaner solid color look */
 
 .local_aurasupport-dashboard-grid {
     display: grid;
@@ -215,19 +207,19 @@ table.dataTable tbody tr:hover {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
+    box-shadow: 0 0.25rem 0.5rem rgba(0,0,0,0.05);
     transition: transform 0.3s ease;
     border: none;
 }
 
 .local_aurasupport-stat-card:hover {
-    transform: translateY(-5px);
+    transform: translateY(-3px);
+    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.1);
 }
 
 .local_aurasupport-stat-card h5 {
-    font-size: 1rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    opacity: 0.8;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    opacity: 0.9;
 }
