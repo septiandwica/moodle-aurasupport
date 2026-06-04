@@ -148,20 +148,30 @@ echo '</tbody></table>';
 echo html_writer::end_tag('div');
 
 $js = "
-require(['jquery'], function($) {
+require.config({
+    paths: {
+        'datatables.net': 'https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min',
+        'datatables.net-bs4': 'https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min',
+        'datatables.net-buttons': 'https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min',
+        'datatables.net-buttons-html5': 'https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min',
+        'datatables.net-buttons-print': 'https://cdn.datatables.net/buttons/2.3.6/js/buttons.print.min'
+    },
+    shim: {
+        'datatables.net-bs4': ['datatables.net'],
+        'datatables.net-buttons': ['datatables.net'],
+        'datatables.net-buttons-html5': ['datatables.net-buttons'],
+        'datatables.net-buttons-print': ['datatables.net-buttons']
+    }
+});
+
+require(['jquery', 'datatables.net', 'datatables.net-bs4', 'datatables.net-buttons', 'datatables.net-buttons-html5', 'datatables.net-buttons-print'], function($) {
     $(document).ready(function() {
-        // Wait for DataTables to be fully loaded
-        var checkExist = setInterval(function() {
-           if ($.fn.DataTable) {
-              clearInterval(checkExist);
-              $('#ticketstable').DataTable({
-                  dom: 'Bfrtip',
-                  buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
-                  order: [[7, 'desc']],
-                  language: { search: 'Live Search:' }
-              });
-           }
-        }, 100);
+        $('#ticketstable').DataTable({
+            dom: 'Bfrtip',
+            buttons: ['copy', 'csv', 'print'],
+            order: [[7, 'desc']],
+            language: { search: 'Live Search:' }
+        });
     });
 });
 ";
@@ -170,25 +180,5 @@ $PAGE->requires->js_amd_inline($js);
 echo html_writer::tag('hr', ['class' => 'mt-5 mb-4']);
 echo html_writer::tag('h3', get_string('createticket', 'local_aurasupport'), ['class' => 'mb-4']);
 $mform->display();
-
-// Manually output DataTables CDNs and disable define.amd temporarily
-// to prevent "Mismatched anonymous define() module" crash in Moodle's requirejs
-echo '<script>
-    var originalDefine = window.define;
-    if (originalDefine && originalDefine.amd) {
-        window.moodleAmd = originalDefine.amd;
-        originalDefine.amd = false;
-    }
-</script>';
-echo '<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>';
-echo '<script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script>';
-echo '<script src="https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"></script>';
-echo '<script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js"></script>';
-echo '<script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.print.min.js"></script>';
-echo '<script>
-    if (window.originalDefine && window.moodleAmd) {
-        window.originalDefine.amd = window.moodleAmd;
-    }
-</script>';
 
 echo $OUTPUT->footer();
