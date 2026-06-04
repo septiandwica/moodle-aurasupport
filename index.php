@@ -34,16 +34,23 @@ $PAGE->set_url(new moodle_url('/local/aurasupport/index.php'));
 $PAGE->set_title(get_string('dashboard', 'local_aurasupport'));
 $PAGE->set_heading(get_string('dashboard', 'local_aurasupport'));
 
-// Load ApexCharts via RequireJS to prevent AMD mismatch crashes
-$js = "
-require.config({
-    paths: {
-        'apexcharts': 'https://cdn.jsdelivr.net/npm/apexcharts@3.41.0/dist/apexcharts.min.js'
-    }
-});
-";
-$PAGE->requires->js_amd_inline($js);
 echo $OUTPUT->header();
+
+// Bypass Moodle's RequireJS for ApexCharts (Standalone UMD)
+echo '<script>
+    var originalDefine = window.define;
+    if (originalDefine && originalDefine.amd) {
+        window.moodleAmd = originalDefine.amd;
+        originalDefine.amd = false;
+    }
+</script>';
+echo '<script src="https://cdn.jsdelivr.net/npm/apexcharts@5.13.0/dist/apexcharts.min.js"></script>';
+echo '<script>
+    if (window.originalDefine && window.moodleAmd) {
+        window.originalDefine.amd = window.moodleAmd;
+    }
+</script>';
+
 local_aurasupport_print_tabs('dashboard');
 
 $stats = \local_aurasupport\analytics::get_summary_stats();
