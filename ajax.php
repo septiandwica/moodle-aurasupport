@@ -58,6 +58,21 @@ if ($action === 'widget_create_ticket') {
     
     $id = \local_aurasupport\ticket::create($ticket);
     if ($id) {
+        if (isset($_FILES['attachment']) && $_FILES['attachment']['error'] === UPLOAD_ERR_OK) {
+            $ext = strtolower(pathinfo($_FILES['attachment']['name'], PATHINFO_EXTENSION));
+            if (in_array($ext, ['jpg', 'jpeg', 'png'])) {
+                $fs = get_file_storage();
+                $filerecord = array(
+                    'contextid' => context_system::instance()->id,
+                    'component' => 'local_aurasupport',
+                    'filearea'  => 'ticket_attachment',
+                    'itemid'    => $id,
+                    'filepath'  => '/',
+                    'filename'  => $_FILES['attachment']['name']
+                );
+                $fs->create_file_from_pathname($filerecord, $_FILES['attachment']['tmp_name']);
+            }
+        }
         echo json_encode(['success' => true]);
     } else {
         echo json_encode(['error' => 'Could not create ticket']);
@@ -90,6 +105,26 @@ if ($action === 'widget_get_chat') {
     
     $fs = get_file_storage();
     $syscontext = context_system::instance();
+
+    // Add initial ticket description as the first message
+    $desc_html = format_text($ticket->description);
+    $ticket_files = $fs->get_area_files($syscontext->id, 'local_aurasupport', 'ticket_attachment', $ticket->id, 'filename', false);
+    foreach ($ticket_files as $f) {
+        $url = moodle_url::make_pluginfile_url($f->get_contextid(), $f->get_component(), $f->get_filearea(), $f->get_itemid(), $f->get_filepath(), $f->get_filename());
+        $desc_html .= '<br><a href="'.$url.'" target="_blank"><img src="'.$url.'" style="max-width:100%; border-radius:8px; margin-top:5px; border: 1px solid #ddd;"></a>';
+    }
+    
+    $creator = clone $USER;
+    if ($ticket->userid != $USER->id) {
+        $creator = $DB->get_record('user', ['id' => $ticket->userid]);
+    }
+    $res[] = [
+        'id' => 0,
+        'sender' => fullname($creator),
+        'message' => $desc_html,
+        'timeago' => get_string('ago', 'message', format_time(time() - $ticket->timecreated)),
+        'is_mine' => ($ticket->userid == $USER->id)
+    ];
 
     foreach ($messages as $msg) {
         $message_html = format_text($msg->message);

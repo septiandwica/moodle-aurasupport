@@ -97,6 +97,10 @@
                     <label class="aurasupport-widget-label">Description</label>
                     <textarea id="aurasupport-widget-new-desc" class="aurasupport-widget-input" rows="4" required></textarea>
                 </div>
+                <div class="mb-4">
+                    <label class="aurasupport-widget-label">Attachment <small class="text-muted">(Optional, PNG/JPG)</small></label>
+                    <input type="file" id="aurasupport-widget-new-attach" class="aurasupport-widget-input" accept=".png, .jpg, .jpeg" style="padding: 6px 10px;">
+                </div>
                 <button id="aurasupport-widget-btn-submit" class="aurasupport-submit-btn w-100">Submit Ticket</button>
             </div>
         </div>
@@ -354,6 +358,8 @@ document.addEventListener('DOMContentLoaded', function() {
         var dept = document.getElementById('aurasupport-widget-new-dept').value;
         var priority = document.getElementById('aurasupport-widget-new-priority').value;
         var desc = document.getElementById('aurasupport-widget-new-desc').value.trim();
+        var attachInput = document.getElementById('aurasupport-widget-new-attach');
+        var file = attachInput.files.length > 0 ? attachInput.files[0] : null;
         
         if (!subject || !desc || !dept) {
             alert('Please fill in all required fields (Subject, Department, and Description).');
@@ -364,12 +370,22 @@ document.addEventListener('DOMContentLoaded', function() {
         btn.disabled = true;
         btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Submitting...';
         
-        apiCall('widget_create_ticket', { subject: subject, department: dept, priority: priority, description: desc }, function(res) {
+        var formData = new FormData();
+        formData.append('subject', subject);
+        formData.append('department', dept);
+        formData.append('priority', priority);
+        formData.append('description', desc);
+        if (file) {
+            formData.append('attachment', file);
+        }
+        
+        apiCall('widget_create_ticket', formData, function(res) {
             btn.disabled = false;
             btn.innerHTML = 'Submit Ticket';
             if (res.success) {
                 document.getElementById('aurasupport-widget-new-subject').value = '';
                 document.getElementById('aurasupport-widget-new-desc').value = '';
+                attachInput.value = '';
                 showList();
             } else {
                 alert(res.error || 'Failed to create ticket');
