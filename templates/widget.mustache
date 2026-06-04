@@ -254,7 +254,7 @@ document.addEventListener('DOMContentLoaded', function() {
             var closedNotice = document.getElementById('aurasupport-widget-closed-notice');
             
             if (status == 2) {
-                inputWrapper.classList.add('d-none');
+                inputWrapper.style.display = 'none';
                 if (!closedNotice) {
                     var notice = document.createElement('div');
                     notice.id = 'aurasupport-widget-closed-notice';
@@ -262,11 +262,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     notice.innerHTML = '<small><i class="fa fa-lock"></i> Ticket is resolved. Chat is closed.</small>';
                     inputWrapper.parentNode.appendChild(notice);
                 } else {
-                    closedNotice.classList.remove('d-none');
+                    closedNotice.style.display = 'block';
                 }
             } else {
-                inputWrapper.classList.remove('d-none');
-                if (closedNotice) closedNotice.classList.add('d-none');
+                inputWrapper.style.display = 'flex';
+                if (closedNotice) closedNotice.style.display = 'none';
             }
         });
     }
