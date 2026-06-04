@@ -125,7 +125,7 @@
     </div>
 </div>
 
-<script>
+{{#js}}
 require(['apexcharts'], function(ApexCharts) {
     var rawdata = '{{{chartdata}}}';
     var advrawdata = '{{{advdata}}}';
@@ -190,4 +190,4 @@ require(['apexcharts'], function(ApexCharts) {
     var courseChart = new ApexCharts(document.querySelector("#courseChart"), courseOptions);
     courseChart.render();
 });
-</script>
+{{/js}}
