@@ -406,14 +406,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // AI Ticket Deflection (Debounce logic)
     var kbTypingTimer;
-    var kbDoneTypingInterval = 1500; // 1.5 seconds delay
+    var kbDoneTypingInterval = 2000; // 2 seconds delay
+    var lastCheckedText = ''; // Prevent redundant API calls
 
     function checkKBSuggestions() {
         var subject = document.getElementById('aurasupport-widget-new-subject').value;
         var desc = document.getElementById('aurasupport-widget-new-desc').value;
         var combinedText = (subject + ' ' + desc).trim();
         
-        if (combinedText.length > 10) {
+        if (combinedText.length > 15 && combinedText !== lastCheckedText) {
+            lastCheckedText = combinedText; // Mark as checked
+            
             apiCall('widget_suggest_kb', {text: combinedText}, function(res) {
                 var kbContainer = document.getElementById('aurasupport-widget-kb-suggestions');
                 if (res.success && res.article) {
@@ -427,6 +430,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // Trigger on typing with 2 second debounce
     document.getElementById('aurasupport-widget-new-subject').addEventListener('keyup', function() {
         clearTimeout(kbTypingTimer);
         kbTypingTimer = setTimeout(checkKBSuggestions, kbDoneTypingInterval);
@@ -435,6 +439,12 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('aurasupport-widget-new-desc').addEventListener('keyup', function() {
         clearTimeout(kbTypingTimer);
         kbTypingTimer = setTimeout(checkKBSuggestions, kbDoneTypingInterval);
+    });
+    
+    // Trigger immediately when user moves to next field (blur)
+    document.getElementById('aurasupport-widget-new-subject').addEventListener('blur', function() {
+        clearTimeout(kbTypingTimer);
+        checkKBSuggestions();
     });
 });
 </script>
