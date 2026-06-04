@@ -84,9 +84,9 @@ if ($action === 'widget_create_ticket') {
             if ($suggested) {
                 $url = new moodle_url('/local/aurasupport/kb.php', ['id' => $suggested->id]);
                 $admin = get_admin();
-                $aimsg = "Hi, saya Aura AI. Masalah yang Anda alami sepertinya mirip dengan artikel ini: <br>";
+                $aimsg = "Hi, I am Aura AI. The issue you are experiencing seems to be related to this article: <br>";
                 $aimsg .= "<strong><a href=\"" . $url->out(false) . "\" target=\"_blank\">" . format_string($suggested->title) . "</a></strong><br><br>";
-                $aimsg .= "Apakah panduan ini bisa menyelesaikan masalah Anda?";
+                $aimsg .= "Does this guide help solve your problem?";
                 
                 \local_aurasupport\ticket::add_message($id, $admin->id, ['text' => $aimsg]);
             }
