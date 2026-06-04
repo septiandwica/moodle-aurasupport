@@ -1,0 +1,252 @@
+<div id="aurasupport-widget-container" class="aurasupport-widget-closed">
+    <!-- Floating Button -->
+    <button id="aurasupport-widget-btn" class="aurasupport-floating-btn" aria-label="Open AuraSupport">
+        <i class="fa fa-life-ring"></i>
+    </button>
+
+    <!-- Widget Panel -->
+    <div id="aurasupport-widget-panel" class="aurasupport-widget-panel">
+        <!-- Header -->
+        <div class="aurasupport-widget-header bg-primary text-white">
+            <h5 class="m-0" id="aurasupport-widget-title">AuraSupport</h5>
+            <div>
+                <a href="{{wwwroot}}/local/aurasupport/tickets.php" target="_blank" class="text-white mr-2" title="View Full Dashboard"><i class="fa fa-external-link"></i></a>
+                <button id="aurasupport-widget-close" class="btn btn-sm btn-link text-white p-0"><i class="fa fa-times"></i></button>
+            </div>
+        </div>
+
+        <!-- Main View: List of Tickets -->
+        <div id="aurasupport-widget-view-list" class="aurasupport-widget-body">
+            <div class="p-2">
+                <button id="aurasupport-widget-btn-new" class="btn btn-sm btn-success w-100 mb-3"><i class="fa fa-plus"></i> Create New Ticket</button>
+                <h6 class="text-muted">Recent Tickets</h6>
+                <div id="aurasupport-widget-tickets-list" class="aurasupport-widget-list">
+                    <div class="text-center text-muted py-3"><i class="fa fa-spinner fa-spin"></i> Loading...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat View: Specific Ticket -->
+        <div id="aurasupport-widget-view-chat" class="aurasupport-widget-body d-none">
+            <div class="p-2 border-bottom">
+                <button id="aurasupport-widget-btn-back" class="btn btn-sm btn-light"><i class="fa fa-arrow-left"></i> Back</button>
+                <span id="aurasupport-widget-chat-subject" class="font-weight-bold ml-2">Loading...</span>
+            </div>
+            <div id="aurasupport-widget-chat-messages" class="aurasupport-widget-chat-messages p-2">
+                <!-- Messages go here -->
+            </div>
+            <div class="p-2 border-top bg-light">
+                <div class="input-group">
+                    <input type="hidden" id="aurasupport-widget-chat-id" value="">
+                    <input type="text" id="aurasupport-widget-chat-input" class="form-control form-control-sm" placeholder="Type a reply...">
+                    <div class="input-group-append">
+                        <button id="aurasupport-widget-btn-send" class="btn btn-sm btn-primary"><i class="fa fa-paper-plane"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Create View: New Ticket -->
+        <div id="aurasupport-widget-view-create" class="aurasupport-widget-body d-none">
+            <div class="p-2 border-bottom">
+                <button id="aurasupport-widget-btn-back-create" class="btn btn-sm btn-light"><i class="fa fa-arrow-left"></i> Back</button>
+                <span class="font-weight-bold ml-2">Create Ticket</span>
+            </div>
+            <div class="p-3">
+                <div class="form-group">
+                    <label>Subject</label>
+                    <input type="text" id="aurasupport-widget-new-subject" class="form-control form-control-sm" required>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="aurasupport-widget-new-desc" class="form-control form-control-sm" rows="4" required></textarea>
+                </div>
+                <button id="aurasupport-widget-btn-submit" class="btn btn-sm btn-primary w-100">Submit Ticket</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var config = {
+        wwwroot: "{{wwwroot}}",
+        sesskey: "{{sesskey}}"
+    };
+    
+    var container = document.getElementById('aurasupport-widget-container');
+    var btnOpen = document.getElementById('aurasupport-widget-btn');
+    var panel = document.getElementById('aurasupport-widget-panel');
+    var btnClose = document.getElementById('aurasupport-widget-close');
+    
+    var viewList = document.getElementById('aurasupport-widget-view-list');
+    var viewChat = document.getElementById('aurasupport-widget-view-chat');
+    var viewCreate = document.getElementById('aurasupport-widget-view-create');
+    
+    var ticketsList = document.getElementById('aurasupport-widget-tickets-list');
+    var chatMessages = document.getElementById('aurasupport-widget-chat-messages');
+    
+    // Toggle Widget
+    btnOpen.addEventListener('click', function() {
+        container.classList.remove('aurasupport-widget-closed');
+        container.classList.add('aurasupport-widget-open');
+        showList();
+    });
+    
+    btnClose.addEventListener('click', function() {
+        container.classList.add('aurasupport-widget-closed');
+        container.classList.remove('aurasupport-widget-open');
+    });
+    
+    // Navigation
+    document.getElementById('aurasupport-widget-btn-new').addEventListener('click', function() {
+        viewList.classList.add('d-none');
+        viewCreate.classList.remove('d-none');
+    });
+    
+    document.getElementById('aurasupport-widget-btn-back').addEventListener('click', function() {
+        viewChat.classList.add('d-none');
+        viewList.classList.remove('d-none');
+    });
+    
+    document.getElementById('aurasupport-widget-btn-back-create').addEventListener('click', function() {
+        viewCreate.classList.add('d-none');
+        viewList.classList.remove('d-none');
+    });
+    
+    // API Calls
+    function apiCall(action, data, callback) {
+        var formData = new FormData();
+        formData.append('sesskey', config.sesskey);
+        formData.append('action', action);
+        for (var key in data) {
+            formData.append(key, data[key]);
+        }
+        
+        fetch(config.wwwroot + '/local/aurasupport/ajax.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(result => callback(result))
+        .catch(error => console.error('Error:', error));
+    }
+    
+    function showList() {
+        viewCreate.classList.add('d-none');
+        viewChat.classList.add('d-none');
+        viewList.classList.remove('d-none');
+        
+        ticketsList.innerHTML = '<div class="text-center text-muted py-3"><i class="fa fa-spinner fa-spin"></i> Loading...</div>';
+        
+        apiCall('widget_get_tickets', {}, function(res) {
+            if (res.error) {
+                ticketsList.innerHTML = '<div class="text-danger p-2">' + res.error + '</div>';
+                return;
+            }
+            if (res.length === 0) {
+                ticketsList.innerHTML = '<div class="text-muted p-2 text-center">No active tickets.</div>';
+                return;
+            }
+            
+            var html = '';
+            res.forEach(function(t) {
+                var badge = t.status == 0 ? 'badge-danger' : (t.status == 1 ? 'badge-warning' : 'badge-success');
+                var statusText = t.status == 0 ? 'Open' : (t.status == 1 ? 'Pending' : 'Resolved');
+                html += '<div class="aurasupport-widget-ticket-item p-2 border-bottom" data-id="'+t.id+'" data-subject="'+t.subject+'" style="cursor:pointer;">';
+                html += '<div class="d-flex justify-content-between">';
+                html += '<strong>' + t.subject + '</strong>';
+                html += '<span class="badge ' + badge + '">' + statusText + '</span>';
+                html += '</div>';
+                html += '<small class="text-muted">' + t.timeago + '</small>';
+                html += '</div>';
+            });
+            ticketsList.innerHTML = html;
+            
+            // Bind clicks
+            var items = ticketsList.querySelectorAll('.aurasupport-widget-ticket-item');
+            items.forEach(function(item) {
+                item.addEventListener('click', function() {
+                    openChat(this.getAttribute('data-id'), this.getAttribute('data-subject'));
+                });
+            });
+        });
+    }
+    
+    function openChat(ticketId, subject) {
+        viewList.classList.add('d-none');
+        viewChat.classList.remove('d-none');
+        document.getElementById('aurasupport-widget-chat-subject').textContent = subject;
+        document.getElementById('aurasupport-widget-chat-id').value = ticketId;
+        
+        chatMessages.innerHTML = '<div class="text-center text-muted py-3"><i class="fa fa-spinner fa-spin"></i> Loading...</div>';
+        
+        apiCall('widget_get_chat', { ticketid: ticketId }, function(res) {
+            if (res.error) {
+                chatMessages.innerHTML = '<div class="text-danger p-2">' + res.error + '</div>';
+                return;
+            }
+            var html = '';
+            res.forEach(function(m) {
+                var alignClass = m.is_mine ? 'text-right' : 'text-left';
+                var bgClass = m.is_mine ? 'bg-primary text-white' : 'bg-light border';
+                html += '<div class="mb-2 ' + alignClass + '">';
+                html += '<small class="d-block text-muted" style="font-size:0.7rem;">' + m.sender + ' &bull; ' + m.timeago + '</small>';
+                html += '<div class="d-inline-block p-2 rounded ' + bgClass + '" style="max-width:85%; text-align:left;">' + m.message + '</div>';
+                html += '</div>';
+            });
+            chatMessages.innerHTML = html;
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        });
+    }
+    
+    // Submit Reply
+    document.getElementById('aurasupport-widget-btn-send').addEventListener('click', function() {
+        var input = document.getElementById('aurasupport-widget-chat-input');
+        var ticketId = document.getElementById('aurasupport-widget-chat-id').value;
+        var msg = input.value.trim();
+        if (!msg) return;
+        
+        input.value = '';
+        input.disabled = true;
+        this.disabled = true;
+        
+        apiCall('widget_send_reply', { ticketid: ticketId, message: msg }, function(res) {
+            input.disabled = false;
+            document.getElementById('aurasupport-widget-btn-send').disabled = false;
+            if (res.success) {
+                openChat(ticketId, document.getElementById('aurasupport-widget-chat-subject').textContent);
+            } else {
+                alert(res.error || 'Failed to send message');
+            }
+        });
+    });
+    
+    // Create Ticket
+    document.getElementById('aurasupport-widget-btn-submit').addEventListener('click', function() {
+        var subject = document.getElementById('aurasupport-widget-new-subject').value.trim();
+        var desc = document.getElementById('aurasupport-widget-new-desc').value.trim();
+        
+        if (!subject || !desc) {
+            alert('Please fill in both fields.');
+            return;
+        }
+        
+        var btn = this;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Submitting...';
+        
+        apiCall('widget_create_ticket', { subject: subject, description: desc }, function(res) {
+            btn.disabled = false;
+            btn.innerHTML = 'Submit Ticket';
+            if (res.success) {
+                document.getElementById('aurasupport-widget-new-subject').value = '';
+                document.getElementById('aurasupport-widget-new-desc').value = '';
+                showList();
+            } else {
+                alert(res.error || 'Failed to create ticket');
+            }
+        });
+    });
+});
+</script>
