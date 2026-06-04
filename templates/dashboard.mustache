@@ -126,7 +126,7 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+require(['apexcharts'], function(ApexCharts) {
     var rawdata = '{{{chartdata}}}';
     var advrawdata = '{{{advdata}}}';
     var data = JSON.parse(rawdata.replace(/&quot;/g, '"'));

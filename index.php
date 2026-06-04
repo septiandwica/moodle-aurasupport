@@ -34,9 +34,15 @@ $PAGE->set_url(new moodle_url('/local/aurasupport/index.php'));
 $PAGE->set_title(get_string('dashboard', 'local_aurasupport'));
 $PAGE->set_heading(get_string('dashboard', 'local_aurasupport'));
 
-// Add Apexcharts from CDN
-$PAGE->requires->js(new moodle_url('https://cdn.jsdelivr.net/npm/apexcharts'));
-
+// Load ApexCharts via RequireJS to prevent AMD mismatch crashes
+$js = "
+require.config({
+    paths: {
+        'apexcharts': 'https://cdn.jsdelivr.net/npm/apexcharts'
+    }
+});
+";
+$PAGE->requires->js_amd_inline($js);
 echo $OUTPUT->header();
 local_aurasupport_print_tabs('dashboard');
 
