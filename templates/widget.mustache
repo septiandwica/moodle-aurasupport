@@ -101,15 +101,6 @@
                     <label class="aurasupport-widget-label">Attachment <small class="text-muted">(Optional, PNG/JPG)</small></label>
                     <input type="file" id="aurasupport-widget-new-attach" class="aurasupport-widget-input" accept=".png, .jpg, .jpeg" style="padding: 6px 10px;">
                 </div>
-                <div id="aurasupport-widget-kb-suggestions" class="mb-3 d-none" style="background: linear-gradient(135deg, #e3f2fd, #bbdefb); border-radius: 8px; padding: 12px; font-size: 0.85rem; border: 1px solid #90caf9; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-                    <div style="color: #1976d2; font-weight: bold; margin-bottom: 5px;">
-                        <i class="fa fa-magic"></i> Aura AI Suggestion
-                    </div>
-                    <div style="color: #0d47a1; margin-bottom: 8px;">Mungkinkah artikel ini dapat menyelesaikan masalah Anda?</div>
-                    <a id="aurasupport-widget-kb-link" href="#" target="_blank" style="display: block; background: white; padding: 8px 10px; border-radius: 6px; text-decoration: none; color: #1565c0; font-weight: 600; border: 1px solid #bbdefb; transition: all 0.2s;">
-                        <i class="fa fa-book mr-1"></i> <span id="aurasupport-widget-kb-title">Article Title</span>
-                    </a>
-                </div>
                 <button id="aurasupport-widget-btn-submit" class="aurasupport-submit-btn w-100">Submit Ticket</button>
             </div>
         </div>
@@ -376,7 +367,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         var btn = this;
         btn.disabled = true;
-        btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Submitting...';
+        btn.textContent = 'Submitting...';
         
         var formData = new FormData();
         formData.append('subject', subject);
@@ -398,53 +389,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('aurasupport-widget-new-subject').value = '';
                 document.getElementById('aurasupport-widget-new-desc').value = '';
                 document.getElementById('aurasupport-widget-new-attach').value = '';
-                document.getElementById('aurasupport-widget-kb-suggestions').classList.add('d-none');
                 showList();
             }
         });
-    });
-
-    // AI Ticket Deflection (Debounce logic)
-    var kbTypingTimer;
-    var kbDoneTypingInterval = 2000; // 2 seconds delay
-    var lastCheckedText = ''; // Prevent redundant API calls
-
-    function checkKBSuggestions() {
-        var subject = document.getElementById('aurasupport-widget-new-subject').value;
-        var desc = document.getElementById('aurasupport-widget-new-desc').value;
-        var combinedText = (subject + ' ' + desc).trim();
-        
-        if (combinedText.length > 15 && combinedText !== lastCheckedText) {
-            lastCheckedText = combinedText; // Mark as checked
-            
-            apiCall('widget_suggest_kb', {text: combinedText}, function(res) {
-                var kbContainer = document.getElementById('aurasupport-widget-kb-suggestions');
-                if (res.success && res.article) {
-                    document.getElementById('aurasupport-widget-kb-title').textContent = res.article.title;
-                    document.getElementById('aurasupport-widget-kb-link').href = res.article.url;
-                    kbContainer.classList.remove('d-none');
-                } else {
-                    kbContainer.classList.add('d-none');
-                }
-            });
-        }
-    }
-
-    // Trigger on typing with 2 second debounce
-    document.getElementById('aurasupport-widget-new-subject').addEventListener('keyup', function() {
-        clearTimeout(kbTypingTimer);
-        kbTypingTimer = setTimeout(checkKBSuggestions, kbDoneTypingInterval);
-    });
-    
-    document.getElementById('aurasupport-widget-new-desc').addEventListener('keyup', function() {
-        clearTimeout(kbTypingTimer);
-        kbTypingTimer = setTimeout(checkKBSuggestions, kbDoneTypingInterval);
-    });
-    
-    // Trigger immediately when user moves to next field (blur)
-    document.getElementById('aurasupport-widget-new-subject').addEventListener('blur', function() {
-        clearTimeout(kbTypingTimer);
-        checkKBSuggestions();
     });
 });
 </script>

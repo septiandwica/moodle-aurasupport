@@ -74,34 +74,28 @@ if ($action === 'widget_create_ticket') {
                 $fs->create_file_from_pathname($filerecord, $_FILES['attachment']['tmp_name']);
             }
         }
+
+        // Post-Submit AI Ticket Deflection for High (2) or Urgent (3) priority
+        if ($priority == 2 || $priority == 3) {
+            require_once($CFG->dirroot . '/local/aurasupport/classes/ai_manager.php');
+            $combinedText = $subject . ' ' . $desc;
+            $suggested = \local_aurasupport\ai_manager::suggest_kb($combinedText);
+            
+            if ($suggested) {
+                $url = new moodle_url('/local/aurasupport/kb.php', ['id' => $suggested->id]);
+                $admin = get_admin();
+                $aimsg = "Hi, saya Aura AI. Masalah yang Anda alami sepertinya mirip dengan artikel ini: <br>";
+                $aimsg .= "<strong><a href=\"" . $url->out(false) . "\" target=\"_blank\">" . format_string($suggested->title) . "</a></strong><br><br>";
+                $aimsg .= "Apakah panduan ini bisa menyelesaikan masalah Anda?";
+                
+                \local_aurasupport\ticket::add_message($id, $admin->id, ['text' => $aimsg]);
+            }
+        }
+
         echo json_encode(['success' => true]);
     } else {
         echo json_encode(['error' => 'Could not create ticket']);
     }
-    die();
-}
-
-if ($action === 'widget_suggest_kb') {
-    require_sesskey();
-    require_once($CFG->dirroot . '/local/aurasupport/classes/ai_manager.php');
-    $text = required_param('text', PARAM_TEXT);
-    
-    if (trim($text) !== '') {
-        $suggested = \local_aurasupport\ai_manager::suggest_kb($text);
-        if ($suggested) {
-            $url = new moodle_url('/local/aurasupport/kb.php', ['id' => $suggested->id]);
-            echo json_encode([
-                'success' => true, 
-                'article' => [
-                    'id' => $suggested->id, 
-                    'title' => format_string($suggested->title),
-                    'url' => $url->out(false)
-                ]
-            ]);
-            die();
-        }
-    }
-    echo json_encode(['success' => false]);
     die();
 }
 
