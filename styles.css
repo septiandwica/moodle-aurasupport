@@ -313,3 +313,50 @@ table.dataTable tbody tr:hover {
 .d-none {
     display: none !important;
 }
+
+/* Chat Input Styling */
+.aurasupport-chat-input-wrapper {
+    display: flex;
+    align-items: center;
+    background: #f1f5fb;
+    border-radius: 25px;
+    padding: 5px 5px 5px 15px;
+    border: 1px solid var(--aura-border);
+}
+
+.aurasupport-chat-input {
+    flex: 1;
+    border: none !important;
+    background: transparent !important;
+    outline: none !important;
+    box-shadow: none !important;
+    padding: 8px 0;
+    font-size: 14px;
+    color: var(--aura-text-main);
+}
+
+.aurasupport-chat-input:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+.aurasupport-chat-send-btn {
+    background-color: var(--aura-primary);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.2s, background-color 0.2s;
+    margin-left: 8px;
+    outline: none;
+}
+
+.aurasupport-chat-send-btn:hover {
+    transform: scale(1.05);
+    background-color: #3b5bbf;
+}
