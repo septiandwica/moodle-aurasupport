@@ -38,7 +38,7 @@ $PAGE->set_heading(get_string('dashboard', 'local_aurasupport'));
 $js = "
 require.config({
     paths: {
-        'apexcharts': 'https://cdn.jsdelivr.net/npm/apexcharts'
+        'apexcharts': 'https://cdn.jsdelivr.net/npm/apexcharts@3.41.0/dist/apexcharts.min.js'
     }
 });
 ";
