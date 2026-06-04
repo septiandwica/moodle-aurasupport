@@ -33,6 +33,16 @@ require_capability('local/aurasupport:createticket', $context);
 $filterstatus = optional_param('filterstatus', -1, PARAM_INT);
 $filterdept = optional_param('filterdept', 0, PARAM_INT);
 
+$delete = optional_param('delete', 0, PARAM_INT);
+if ($delete && is_siteadmin()) {
+    require_sesskey();
+    global $DB;
+    $DB->delete_records('local_aurasupport_messages', ['ticketid' => $delete]);
+    $DB->delete_records('local_aurasupport_tickets', ['id' => $delete]);
+    \core\notification::add('Ticket has been permanently deleted.', \core\notification::SUCCESS);
+    redirect(new moodle_url('/local/aurasupport/tickets.php'));
+}
+
 $PAGE->set_context($context);
 $PAGE->set_url(new moodle_url('/local/aurasupport/tickets.php'));
 $PAGE->set_title(get_string('tickets', 'local_aurasupport'));
@@ -151,6 +161,12 @@ foreach ($tickets as $t) {
     $url = new moodle_url('/local/aurasupport/view.php', ['id' => $t->id]);
     $btn = html_writer::link($url, 'View', ['class' => 'btn btn-sm btn-outline-primary rounded-pill']);
     
+    if (is_siteadmin()) {
+        $delurl = new moodle_url('/local/aurasupport/tickets.php', ['delete' => $t->id, 'sesskey' => sesskey()]);
+        $delbtn = html_writer::link($delurl, 'Delete', ['class' => 'btn btn-sm btn-outline-danger rounded-pill ml-1', 'onclick' => 'return confirm("Are you sure you want to completely delete this ticket?");']);
+        $btn .= $delbtn;
+    }
+
     echo '<tr>';
     echo '<td>' . $t->id . '</td>';
     echo '<td class="font-weight-bold text-dark">' . s($t->subject) . '</td>';
