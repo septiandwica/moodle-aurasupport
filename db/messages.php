@@ -27,9 +27,17 @@ defined('MOODLE_INTERNAL') || die();
 $messageproviders = array(
     // Triggered when a new ticket is created
     'ticketcreated' => array(
-        'capability' => 'local/aurasupport:manage'
+        'capability' => 'local/aurasupport:manage',
+        'defaults' => array(
+            'popup' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDIN + MESSAGE_DEFAULT_LOGGEDOFF,
+            'email' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDIN + MESSAGE_DEFAULT_LOGGEDOFF,
+        )
     ),
     // Triggered when a ticket gets a reply
     'ticketreplied' => array(
+        'defaults' => array(
+            'popup' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDIN + MESSAGE_DEFAULT_LOGGEDOFF,
+            'email' => MESSAGE_PERMITTED + MESSAGE_DEFAULT_LOGGEDIN + MESSAGE_DEFAULT_LOGGEDOFF,
+        )
     )
 );

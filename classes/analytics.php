@@ -44,10 +44,10 @@ class analytics {
         
         // Count tickets by status for a pie chart
         $statuses = [
-            'Open' => $DB->count_records('local_aurasupport_tickets', ['status' => 0]),
-            'Pending' => $DB->count_records('local_aurasupport_tickets', ['status' => 1]),
-            'Resolved' => $DB->count_records('local_aurasupport_tickets', ['status' => 2]),
-            'Closed' => $DB->count_records('local_aurasupport_tickets', ['status' => 3]),
+            'Open' => (int)$DB->count_records('local_aurasupport_tickets', ['status' => 0]),
+            'Pending' => (int)$DB->count_records('local_aurasupport_tickets', ['status' => 1]),
+            'Resolved' => (int)$DB->count_records('local_aurasupport_tickets', ['status' => 2]),
+            'Closed' => (int)$DB->count_records('local_aurasupport_tickets', ['status' => 3]),
         ];
         
         $chartdata = [
@@ -72,6 +72,9 @@ class analytics {
             }
             $trend_data[$date]++;
         }
+        if (empty($trend_data)) {
+            $trend_data[date('M d')] = 0;
+        }
         
         // 2. Bar Chart (By Department)
         $sql = "SELECT d.name, COUNT(t.id) AS count 
@@ -84,7 +87,11 @@ class analytics {
         foreach ($dept_counts as $dc) {
             $name = $dc->name ? $dc->name : 'General';
             $dept_labels[] = $name;
-            $dept_data[] = $dc->count;
+            $dept_data[] = (int)$dc->count;
+        }
+        if (empty($dept_labels)) {
+            $dept_labels = ['No Data'];
+            $dept_data = [0];
         }
         
         // 3. Leaderboard
@@ -128,12 +135,13 @@ class analytics {
         // 6. Tickets by Priority
         $sql = "SELECT priority, COUNT(id) AS count FROM {local_aurasupport_tickets} GROUP BY priority";
         $priority_counts = $DB->get_records_sql($sql);
-        $priority_labels = [];
-        $priority_data = [];
-        $p_map = [0 => 'Low', 1 => 'Medium', 2 => 'High', 3 => 'Urgent'];
+        $priority_labels = ['Low', 'Medium', 'High', 'Urgent'];
+        $priority_data = [0, 0, 0, 0];
         foreach ($priority_counts as $pc) {
-            $priority_labels[] = $p_map[$pc->priority];
-            $priority_data[] = $pc->count;
+            $p = (int)$pc->priority;
+            if ($p >= 0 && $p <= 3) {
+                $priority_data[$p] = (int)$pc->count;
+            }
         }
 
         // 7. Tickets by Course
@@ -146,7 +154,11 @@ class analytics {
         $course_data = [];
         foreach ($course_counts as $cc) {
             $course_labels[] = $cc->shortname;
-            $course_data[] = $cc->count;
+            $course_data[] = (int)$cc->count;
+        }
+        if (empty($course_labels)) {
+            $course_labels = ['No Data'];
+            $course_data = [0];
         }
 
         // 8. Recent Unresolved Tickets
