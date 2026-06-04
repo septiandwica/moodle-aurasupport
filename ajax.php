@@ -152,16 +152,28 @@ $sql = "SELECT m.*, u.firstname, u.lastname
 $messages = $DB->get_records_sql($sql, ['ticketid' => $ticketid, 'lastmsgid' => $lastmsgid]);
 
 $results = [];
+$fs = get_file_storage();
+$syscontext = context_system::instance();
+
 foreach ($messages as $msg) {
     $is_admin = ($msg->userid != $ticket->userid);
     $wrapper_class = $is_admin ? 'admin' : 'user';
     $fullname = fullname($msg); // Because we fetched firstname, lastname
     
+    $msg_html = format_text($msg->message);
+    
+    // Fetch message attachments
+    $msgfiles = $fs->get_area_files($syscontext->id, 'local_aurasupport', 'message_attachment', $msg->id, 'filename', false);
+    foreach ($msgfiles as $f) {
+        $url = moodle_url::make_pluginfile_url($f->get_contextid(), $f->get_component(), $f->get_filearea(), $f->get_itemid(), $f->get_filepath(), $f->get_filename());
+        $msg_html .= '<br><a href="'.$url.'" target="_blank"><img src="'.$url.'" style="max-width:100%; max-height: 400px; border-radius:8px; margin-top:5px; border: 1px solid #ddd;"></a>';
+    }
+    
     $results[] = [
         'id' => $msg->id,
         'html' => \html_writer::start_tag('div', ['class' => 'local_aurasupport-bubble-wrapper ' . $wrapper_class]) .
                   \html_writer::tag('div', '<strong>'.$fullname.'</strong> ('.userdate($msg->timecreated).')', ['class' => 'local_aurasupport-bubble-meta']) .
-                  \html_writer::tag('div', format_text($msg->message), ['class' => 'local_aurasupport-bubble']) .
+                  \html_writer::tag('div', $msg_html, ['class' => 'local_aurasupport-bubble']) .
                   \html_writer::end_tag('div')
     ];
 }

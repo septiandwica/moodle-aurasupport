@@ -150,7 +150,19 @@ echo html_writer::start_tag('div', ['class' => 'local_aurasupport-chat-container
 $creator = $DB->get_record('user', ['id' => $ticket->userid]);
 echo html_writer::start_tag('div', ['class' => 'local_aurasupport-bubble-wrapper user']);
 echo html_writer::tag('div', '<strong>'.fullname($creator).'</strong> ('.userdate($ticket->timecreated).')', ['class' => 'local_aurasupport-bubble-meta']);
-echo html_writer::tag('div', format_text($ticket->description), ['class' => 'local_aurasupport-bubble']);
+
+$desc_html = format_text($ticket->description);
+$fs = get_file_storage();
+$syscontext = context_system::instance();
+
+// Fetch ticket attachments
+$files = $fs->get_area_files($syscontext->id, 'local_aurasupport', 'ticket_attachment', $ticket->id, 'filename', false);
+foreach ($files as $f) {
+    $url = moodle_url::make_pluginfile_url($f->get_contextid(), $f->get_component(), $f->get_filearea(), $f->get_itemid(), $f->get_filepath(), $f->get_filename());
+    $desc_html .= '<br><a href="'.$url.'" target="_blank"><img src="'.$url.'" style="max-width:100%; max-height: 400px; border-radius:8px; margin-top:5px; border: 1px solid #ddd;"></a>';
+}
+
+echo html_writer::tag('div', $desc_html, ['class' => 'local_aurasupport-bubble']);
 echo html_writer::end_tag('div');
 
 $lastmsgid = 0;
@@ -163,9 +175,18 @@ foreach ($messages as $msg) {
     $wrapper_class = $is_admin ? 'admin' : 'user';
     $sender = $DB->get_record('user', ['id' => $msg->userid]);
     
+    $msg_html = format_text($msg->message);
+    
+    // Fetch message attachments
+    $msgfiles = $fs->get_area_files($syscontext->id, 'local_aurasupport', 'message_attachment', $msg->id, 'filename', false);
+    foreach ($msgfiles as $f) {
+        $url = moodle_url::make_pluginfile_url($f->get_contextid(), $f->get_component(), $f->get_filearea(), $f->get_itemid(), $f->get_filepath(), $f->get_filename());
+        $msg_html .= '<br><a href="'.$url.'" target="_blank"><img src="'.$url.'" style="max-width:100%; max-height: 400px; border-radius:8px; margin-top:5px; border: 1px solid #ddd;"></a>';
+    }
+    
     echo html_writer::start_tag('div', ['class' => 'local_aurasupport-bubble-wrapper ' . $wrapper_class]);
     echo html_writer::tag('div', '<strong>'.fullname($sender).'</strong> ('.userdate($msg->timecreated).')', ['class' => 'local_aurasupport-bubble-meta']);
-    echo html_writer::tag('div', format_text($msg->message), ['class' => 'local_aurasupport-bubble']);
+    echo html_writer::tag('div', $msg_html, ['class' => 'local_aurasupport-bubble']);
     echo html_writer::end_tag('div');
 }
 echo html_writer::end_tag('div'); // End Chat Container
