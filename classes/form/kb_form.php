@@ -36,7 +36,7 @@ class kb_form extends \moodleform {
         $mform->addRule('title', null, 'required', null, 'client');
 
         $mform->addElement('editor', 'content', 'Content');
-        $mform->setType('content', PARAM_CLEANHTML);
+        $mform->setType('content', PARAM_RAW);
         $mform->addRule('content', null, 'required', null, 'client');
 
         $this->add_action_buttons(false, 'Save Article');
