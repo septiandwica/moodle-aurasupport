@@ -443,20 +443,28 @@ table.dataTable tbody tr:hover {
 
 /* Responsive Widget for Mobile Devices */
 @media screen and (max-width: 576px) {
+    #aurasupport-widget-container.aurasupport-widget-open {
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100% !important;
+        height: 100% !important;
+    }
     .aurasupport-widget-panel {
-        position: fixed;
+        position: absolute;
         top: 0;
         left: 0;
         bottom: 0 !important;
         right: 0 !important;
-        width: 100vw !important;
-        height: 100vh !important;
-        max-height: 100vh !important;
+        width: 100% !important;
+        height: 100% !important;
+        max-height: none !important;
         border-radius: 0;
         border: none;
         z-index: 99999;
     }
     .aurasupport-widget-open .aurasupport-floating-btn {
-        display: none; /* Hide the floating button on mobile when the widget is open */
+        display: none !important; 
     }
 }
