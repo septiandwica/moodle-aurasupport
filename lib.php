@@ -47,3 +47,19 @@ function local_aurasupport_extend_navigation(global_navigation $navigation) {
         }
     }
 }
+
+/**
+ * Extend user menu navigation (Top right profile dropdown).
+ * This guarantees the menu appears in modern Moodle 4.x themes.
+ */
+function local_aurasupport_extend_navigation_user(navigation_node $parent) {
+    if (isloggedin() && !isguestuser()) {
+        $parent->add(
+            get_string('pluginname', 'local_aurasupport') . ' (Helpdesk)', 
+            new moodle_url('/local/aurasupport/tickets.php'), 
+            navigation_node::TYPE_CUSTOM, 
+            null, 
+            'local_aurasupport'
+        );
+    }
+}
