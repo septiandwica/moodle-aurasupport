@@ -83,7 +83,7 @@ echo html_writer::end_tag('div');
 // Query Data
 $sqlwhere = '1=1';
 $params = [];
-if (!has_capability('local/aurasupport:manage', $context)) {
+if (!has_capability('moodle/site:config', $context)) {
     $sqlwhere .= ' AND t.userid = :userid';
     $params['userid'] = $USER->id;
 }

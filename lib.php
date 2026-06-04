@@ -24,29 +24,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-/**
- * Extend navigation for AuraSupport.
- */
-function local_aurasupport_extend_navigation(global_navigation $navigation) {
-    global $USER;
-    
-    // Add Helpdesk node to navigation
-    if (isloggedin() && !isguestuser()) {
-        $helpdesk = $navigation->add(get_string('pluginname', 'local_aurasupport'), new moodle_url('/local/aurasupport/tickets.php'), navigation_node::TYPE_CUSTOM, null, 'local_aurasupport');
-        $helpdesk->showinflatnavigation = true;
-        
-        $helpdesk->add(get_string('tickets', 'local_aurasupport'), new moodle_url('/local/aurasupport/tickets.php'));
-        $helpdesk->add('Knowledge Base', new moodle_url('/local/aurasupport/kb.php'));
-        
-        // Add Dashboard and Management links for managers
-        if (has_capability('local/aurasupport:manage', context_system::instance())) {
-            $helpdesk->add(get_string('dashboard', 'local_aurasupport'), new moodle_url('/local/aurasupport/index.php'));
-            $helpdesk->add('Manage Departments', new moodle_url('/local/aurasupport/manage_depts.php'));
-            $helpdesk->add('Manage Agents', new moodle_url('/local/aurasupport/manage_agents.php'));
-            $helpdesk->add('Manage SLA Rules', new moodle_url('/local/aurasupport/manage_sla.php'));
-        }
-    }
-}
 
 /**
  * Extend user menu navigation (Top right profile dropdown).
@@ -82,7 +59,7 @@ function local_aurasupport_print_tabs($current_tab = 'tickets') {
         'url' => new moodle_url('/local/aurasupport/kb.php')
     ];
 
-    if (has_capability('local/aurasupport:manage', context_system::instance())) {
+    if (has_capability('moodle/site:config', context_system::instance())) {
         $tabs[] = [
             'id' => 'dashboard',
             'name' => 'BI Dashboard',

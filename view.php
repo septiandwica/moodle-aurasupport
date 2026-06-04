@@ -35,13 +35,13 @@ $ticket = \local_aurasupport\ticket::get_by_id($id);
 $context = context_system::instance();
 require_login();
 
-if (!has_capability('local/aurasupport:manage', $context) && $ticket->userid != $USER->id) {
+if (!has_capability('moodle/site:config', $context) && $ticket->userid != $USER->id) {
     print_error('nopermissions', 'error', '', 'view this ticket');
 }
 
 $draft_text = '';
 $action = optional_param('action', '', PARAM_ALPHA);
-if ($action === 'generate_ai' && has_capability('local/aurasupport:manage', $context) && \local_aurasupport\ai_manager::is_enabled()) {
+if ($action === 'generate_ai' && has_capability('moodle/site:config', $context) && \local_aurasupport\ai_manager::is_enabled()) {
     $messages = \local_aurasupport\ticket::get_messages($id);
     $history = '';
     foreach ($messages as $m) {
@@ -63,7 +63,7 @@ if ($draft_text) {
 
 $statusform = null;
 $reassignform = null;
-if (has_capability('local/aurasupport:manage', $context)) {
+if (has_capability('moodle/site:config', $context)) {
     // Status Form
     $statusform = new \local_aurasupport\form\status_form(null, ['ticketid' => $id]);
     $statusform->set_data(['status' => $ticket->status]);
@@ -146,7 +146,7 @@ echo html_writer::start_tag('div', ['class' => 'local_aurasupport-card mb-4']);
 echo html_writer::tag('div', get_string('reply', 'local_aurasupport'), ['class' => 'card-header']);
 echo html_writer::start_tag('div', ['class' => 'card-body']);
 
-if (has_capability('local/aurasupport:manage', $context) && \local_aurasupport\ai_manager::is_enabled()) {
+if (has_capability('moodle/site:config', $context) && \local_aurasupport\ai_manager::is_enabled()) {
     $ai_url = new moodle_url('/local/aurasupport/view.php', ['id' => $id, 'action' => 'generate_ai']);
     echo html_writer::link($ai_url, '✨ Draft Response with Gemini AI', ['class' => 'btn btn-outline-primary mb-3']);
 }
