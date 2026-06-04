@@ -61,3 +61,7 @@ $string['closed_tickets'] = 'Closed Tickets';
 $string['ticket_status_chart'] = 'Tickets by Status';
 $string['updatestatus'] = 'Update Status';
 $string['statusupdated'] = 'Status updated successfully';
+$string['managedepts'] = 'Manage Departments';
+$string['adddepartment'] = 'Add Department';
+$string['departmentname'] = 'Department Name';
+$string['department'] = 'Department';

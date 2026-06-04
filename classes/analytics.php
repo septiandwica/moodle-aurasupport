@@ -115,9 +115,9 @@ class analytics {
         }
         
         // 5. Avg Resolution Time
-        $sql = "SELECT AVG(timeupdated - timecreated) AS avg_time
+        $sql = "SELECT AVG(timemodified - timecreated) AS avg_time
                 FROM {local_aurasupport_tickets}
-                WHERE status >= 2 AND timeupdated > timecreated";
+                WHERE status >= 2 AND timemodified > timecreated";
         $avg_time_rec = $DB->get_record_sql($sql);
         $avg_time_str = 'N/A';
         if ($avg_time_rec && $avg_time_rec->avg_time) {
