@@ -23,6 +23,7 @@ require_login();
 $action = optional_param('action', '', PARAM_TEXT);
 
 if ($action === 'widget_get_tickets') {
+    require_sesskey();
     global $DB;
     // Get active/recent tickets for current user
     $sql = "SELECT * FROM {local_aurasupport_tickets} WHERE userid = :userid ORDER BY timecreated DESC LIMIT 10";
@@ -31,7 +32,7 @@ if ($action === 'widget_get_tickets') {
     foreach ($tickets as $t) {
         $res[] = [
             'id' => $t->id,
-            'subject' => $t->subject,
+            'subject' => format_string($t->subject, true, ['context' => context_system::instance()]),
             'status' => $t->status,
             'timeago' => get_string('ago', 'message', format_time(time() - $t->timecreated))
         ];
@@ -94,6 +95,7 @@ if (!is_siteadmin() && $ticket->userid != $USER->id && !$is_agent_for_this) {
 }
 
 if ($action === 'widget_get_chat') {
+    require_sesskey();
     global $DB;
     $sql = "SELECT m.*, u.firstname, u.lastname 
             FROM {local_aurasupport_messages} m
