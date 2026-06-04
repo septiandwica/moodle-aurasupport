@@ -128,8 +128,12 @@ echo html_writer::tag('div', '<strong>'.fullname($creator).'</strong> ('.userdat
 echo html_writer::tag('div', format_text($ticket->description), ['class' => 'local_aurasupport-bubble']);
 echo html_writer::end_tag('div');
 
+$lastmsgid = 0;
 $messages = \local_aurasupport\ticket::get_messages($id);
 foreach ($messages as $msg) {
+    if ($msg->id > $lastmsgid) {
+        $lastmsgid = $msg->id;
+    }
     $is_admin = ($msg->userid != $ticket->userid);
     $wrapper_class = $is_admin ? 'admin' : 'user';
     $sender = $DB->get_record('user', ['id' => $msg->userid]);
@@ -140,6 +144,51 @@ foreach ($messages as $msg) {
     echo html_writer::end_tag('div');
 }
 echo html_writer::end_tag('div'); // End Chat Container
+
+$ajaxurl = new moodle_url('/local/aurasupport/ajax.php');
+$js = "
+require(['jquery'], function($) {
+    var lastmsgid = {$lastmsgid};
+    var ticketid = {$id};
+    var isPolling = false;
+    
+    // Scroll to bottom initially
+    var chatContainer = $('.local_aurasupport-chat-container');
+    chatContainer.scrollTop(chatContainer[0].scrollHeight);
+
+    setInterval(function() {
+        if (isPolling) return;
+        isPolling = true;
+        $.ajax({
+            url: '{$ajaxurl}',
+            data: { ticketid: ticketid, lastmsgid: lastmsgid },
+            dataType: 'json',
+            success: function(response) {
+                if (response.messages && response.messages.length > 0) {
+                    var needsScroll = false;
+                    // Check if user is scrolled to the bottom before appending
+                    if (chatContainer.scrollTop() + chatContainer.innerHeight() >= chatContainer[0].scrollHeight - 50) {
+                        needsScroll = true;
+                    }
+                    
+                    $.each(response.messages, function(i, msg) {
+                        chatContainer.append(msg.html);
+                        lastmsgid = msg.id;
+                    });
+                    
+                    if (needsScroll) {
+                        chatContainer.scrollTop(chatContainer[0].scrollHeight);
+                    }
+                }
+            },
+            complete: function() {
+                isPolling = false;
+            }
+        });
+    }, 5000);
+});
+";
+$PAGE->requires->js_amd_inline($js);
 
 // Reply Section
 echo html_writer::start_tag('div', ['class' => 'local_aurasupport-card mb-4']);

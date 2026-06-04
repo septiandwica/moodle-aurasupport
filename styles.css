@@ -5,7 +5,7 @@
     --aura-primary: #4e73df;
     --aura-primary-light: #f1f5fb;
     --aura-bg-light: #f8f9fc;
-    --aura-card-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    --aura-card-shadow: none;
     --aura-border: #e3e6f0;
     --aura-text-main: #5a5c69;
     --aura-text-muted: #858796;
@@ -27,14 +27,13 @@
 .local_aurasupport-card {
     background: #fff;
     border-radius: var(--aura-radius);
-    box-shadow: var(--aura-card-shadow);
     border: 1px solid var(--aura-border);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition: transform 0.2s ease;
     overflow: hidden;
 }
 
 .local_aurasupport-card:hover {
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    /* No shadow on hover for flat theme */
 }
 
 .local_aurasupport-card .card-header {
@@ -52,8 +51,7 @@
     gap: 1.5rem;
     padding: 1.5rem;
     background: white;
-    border-radius: var(--aura-radius);
-    box-shadow: var(--aura-card-shadow);
+    border: 1px solid var(--aura-border);
     margin-bottom: 2rem;
 }
 
@@ -91,7 +89,6 @@
     font-size: 0.95rem;
     line-height: 1.5;
     position: relative;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
 .local_aurasupport-bubble p:last-child {
@@ -115,11 +112,9 @@
 /* Ticket Details Layout */
 .local_aurasupport-ticket-header {
     padding: 2rem;
-    background: linear-gradient(135deg, var(--aura-primary) 0%, #224abe 100%);
+    background: var(--aura-primary);
     color: white;
-    border-radius: var(--aura-radius);
     margin-bottom: 2rem;
-    box-shadow: 0 8px 16px rgba(78, 115, 223, 0.25);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -136,8 +131,7 @@
 /* Action Panel */
 .local_aurasupport-action-panel {
     background: white;
-    border-radius: var(--aura-radius);
-    box-shadow: var(--aura-card-shadow);
+    border: 1px solid var(--aura-border);
     padding: 1.5rem;
     position: sticky;
     top: 20px;
@@ -200,21 +194,21 @@ table.dataTable tbody tr:hover {
     margin-bottom: 2rem;
 }
 
+/* Dashboard Stats */
 .local_aurasupport-stat-card {
+    background: white;
     border-radius: var(--aura-radius);
     padding: 1.5rem;
-    color: white;
+    border: 1px solid var(--aura-border);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    box-shadow: 0 0.25rem 0.5rem rgba(0,0,0,0.05);
-    transition: transform 0.3s ease;
-    border: none;
+    transition: transform 0.2s;
+    height: 100%;
 }
 
 .local_aurasupport-stat-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.1);
+    /* No shadow on hover */
 }
 
 .local_aurasupport-stat-card h5 {
