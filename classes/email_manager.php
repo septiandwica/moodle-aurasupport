@@ -55,7 +55,9 @@ class email_manager {
         $eventdata->fullmessage       = $message;
         $eventdata->fullmessageformat = FORMAT_PLAIN;
         $eventdata->fullmessagehtml   = '';
-        $eventdata->smallmessage      = '';
+        $eventdata->smallmessage      = $subject;
+        $eventdata->contexturl        = $CFG->wwwroot . '/local/aurasupport/view.php?id=' . $ticket->id;
+        $eventdata->contexturlname    = 'View Ticket';
         $eventdata->notification      = 1;
         
         message_send($eventdata);
@@ -89,7 +91,9 @@ class email_manager {
         $eventdata->fullmessage       = $message;
         $eventdata->fullmessageformat = FORMAT_PLAIN;
         $eventdata->fullmessagehtml   = '';
-        $eventdata->smallmessage      = '';
+        $eventdata->smallmessage      = $subject;
+        $eventdata->contexturl        = $CFG->wwwroot . '/local/aurasupport/view.php?id=' . $ticket->id;
+        $eventdata->contexturlname    = 'View Ticket';
         $eventdata->notification      = 1;
         
         message_send($eventdata);

@@ -43,13 +43,31 @@ if (!is_siteadmin() && $ticket->userid != $USER->id && !$is_agent_for_this) {
 
 $draft_text = '';
 $action = optional_param('action', '', PARAM_ALPHANUMEXT);
+
+// 1. Fetch names for BOTH manual template and AI template
+global $DB, $USER;
+$submitter = $DB->get_record('user', ['id' => $ticket->userid], 'firstname, lastname');
+$submitter_name = $submitter ? fullname($submitter) : 'User';
+
+$agent_name = fullname($USER);
+
+$dept_name = '';
+if (!empty($ticket->departmentid)) {
+    $dept = $DB->get_record('local_aurasupport_depts', ['id' => $ticket->departmentid], 'name');
+    if ($dept) {
+        $dept_name = $dept->name;
+    }
+}
+
+// 2. Generate AI Draft if requested
 if ($action === 'generate_ai' && (is_siteadmin() || $is_agent_for_this) && \local_aurasupport\ai_manager::is_enabled()) {
     $messages = \local_aurasupport\ticket::get_messages($id);
     $history = '';
     foreach ($messages as $m) {
         $history .= "User " . $m->userid . ": " . strip_tags($m->message) . "\n";
     }
-    $draft_text = \local_aurasupport\ai_manager::generate_reply($ticket->subject, strip_tags($ticket->description), $history);
+    
+    $draft_text = \local_aurasupport\ai_manager::generate_reply($ticket->subject, strip_tags($ticket->description), $history, $submitter_name, $agent_name, $dept_name);
     \core\notification::add('AI Draft generated. Please review before submitting.', \core\notification::INFO);
 }
 
@@ -61,6 +79,11 @@ $PAGE->set_heading(get_string('ticketdetails', 'local_aurasupport'));
 $mform = new \local_aurasupport\form\reply_form(null, ['ticketid' => $id]);
 if ($draft_text) {
     $mform->set_data(['message' => ['text' => $draft_text, 'format' => FORMAT_HTML]]);
+} else if (is_siteadmin() || $is_agent_for_this) {
+    // If no AI draft is generated, load the standard manual template
+    $dept_str = !empty($dept_name) ? " - " . $dept_name : "";
+    $default_template = "<p>Hi there {$submitter_name},</p><p><br><br></p><p>Best regards,<br><strong>{$agent_name}</strong>{$dept_str}</p>";
+    $mform->set_data(['message' => ['text' => $default_template, 'format' => FORMAT_HTML]]);
 }
 
 $statusform = null;

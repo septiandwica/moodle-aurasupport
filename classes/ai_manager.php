@@ -31,7 +31,7 @@ class ai_manager {
         return get_config('local_aurasupport', 'enable_ai') && !empty(get_config('local_aurasupport', 'gemini_api_key'));
     }
 
-    public static function generate_reply($ticket_subject, $ticket_description, $history = '') {
+    public static function generate_reply($ticket_subject, $ticket_description, $history = '', $submitter_name = 'User', $agent_name = 'Agent', $dept_name = '') {
         global $CFG;
         require_once($CFG->libdir . '/filelib.php');
 
@@ -53,11 +53,16 @@ class ai_manager {
         if (!empty($history)) {
             $prompt .= "\nPrevious Conversation History:\n" . $history . "\n";
         }
+        
+        $dept_str = !empty($dept_name) ? " - " . $dept_name : "";
+
         $prompt .= "\nInstructions for AI:\n";
-        $prompt .= "1. Start with a polite and friendly greeting (e.g., 'Hello', 'Hi there').\n";
+        $prompt .= "1. ALWAYS start with the exact greeting: 'Hi there {$submitter_name},'.\n";
         $prompt .= "2. Show empathy and apologize for any inconvenience if the user is reporting an error or issue.\n";
         $prompt .= "3. Provide technical solutions or steps that are clear, logical, and easy to follow. Use HTML bullet points/lists if you need to explain steps.\n";
-        $prompt .= "4. End with a professional closing sentence and offer further assistance.\n";
+        $prompt .= "4. End the reply EXACTLY with this format:\n";
+        $prompt .= "   Best regards,\n";
+        $prompt .= "   {$agent_name}{$dept_str}\n";
         $prompt .= "5. DO NOT reply with introductory meta-text like 'Sure, here is the draft'. Output ONLY the body of the reply itself.\n";
         $prompt .= "6. Format the response using clean, pure HTML elements (use <p>, <ul>, <li>, <strong>, <br>).\n";
 
