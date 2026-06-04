@@ -42,14 +42,7 @@ $PAGE->set_heading(get_string('tickets', 'local_aurasupport'));
 $PAGE->requires->css(new moodle_url('https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap4.min.css'));
 $PAGE->requires->css(new moodle_url('https://cdn.datatables.net/buttons/2.3.6/css/buttons.bootstrap4.min.css'));
 
-$PAGE->requires->js(new moodle_url('https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js'));
-$PAGE->requires->js(new moodle_url('https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js'));
-$PAGE->requires->js(new moodle_url('https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js'));
-$PAGE->requires->js(new moodle_url('https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js'));
-$PAGE->requires->js(new moodle_url('https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js'));
-$PAGE->requires->js(new moodle_url('https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js'));
-$PAGE->requires->js(new moodle_url('https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js'));
-$PAGE->requires->js(new moodle_url('https://cdn.datatables.net/buttons/2.3.6/js/buttons.print.min.js'));
+// Removed PAGE->requires->js for CDNs. They will be output manually below to prevent AMD crashes.
 
 $mform = new \local_aurasupport\form\ticket_form();
 if ($mform->is_cancelled()) {
@@ -177,5 +170,25 @@ $PAGE->requires->js_amd_inline($js);
 echo html_writer::tag('hr', ['class' => 'mt-5 mb-4']);
 echo html_writer::tag('h3', get_string('createticket', 'local_aurasupport'), ['class' => 'mb-4']);
 $mform->display();
+
+// Manually output DataTables CDNs and disable define.amd temporarily
+// to prevent "Mismatched anonymous define() module" crash in Moodle's requirejs
+echo '<script>
+    var originalDefine = window.define;
+    if (originalDefine && originalDefine.amd) {
+        window.moodleAmd = originalDefine.amd;
+        originalDefine.amd = false;
+    }
+</script>';
+echo '<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>';
+echo '<script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap4.min.js"></script>';
+echo '<script src="https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"></script>';
+echo '<script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js"></script>';
+echo '<script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.print.min.js"></script>';
+echo '<script>
+    if (window.originalDefine && window.moodleAmd) {
+        window.originalDefine.amd = window.moodleAmd;
+    }
+</script>';
 
 echo $OUTPUT->footer();
