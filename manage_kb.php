@@ -59,6 +59,8 @@ if ($mform->is_cancelled()) {
 }
 
 echo $OUTPUT->header();
+
+echo html_writer::start_tag('div', ['class' => 'local_aurasupport-container']);
 local_aurasupport_print_tabs('kb');
 
 $articles = $DB->get_records('local_aurasupport_kb', null, 'timecreated DESC');
@@ -83,4 +85,6 @@ echo html_writer::tag('h3', 'Add New Article');
 $mform->display();
 
 echo html_writer::link(new moodle_url('/local/aurasupport/kb.php'), 'Back to Knowledge Base', ['class' => 'btn btn-secondary mt-3']);
+echo html_writer::end_tag('div');
+
 echo $OUTPUT->footer();

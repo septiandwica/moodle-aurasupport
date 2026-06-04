@@ -98,20 +98,53 @@ if ($mform->is_cancelled()) {
 
 echo $OUTPUT->header();
 
-echo html_writer::tag('h3', format_string($ticket->subject));
-echo html_writer::tag('div', format_text($ticket->description), ['class' => 'local_aurasupport-msg']);
+// Start Premium Container
+echo html_writer::start_tag('div', ['class' => 'local_aurasupport-container']);
+
+// Ticket Header
+echo html_writer::start_tag('div', ['class' => 'local_aurasupport-ticket-header']);
+echo html_writer::tag('h2', format_string($ticket->subject));
+$status_map = [
+    0 => '<span class="badge badge-aura badge-warning">Open</span>',
+    1 => '<span class="badge badge-aura badge-info">Pending</span>',
+    2 => '<span class="badge badge-aura badge-success">Resolved</span>',
+    3 => '<span class="badge badge-aura badge-secondary">Closed</span>'
+];
+echo html_writer::tag('div', $status_map[$ticket->status]);
+echo html_writer::end_tag('div'); // End Ticket Header
+
+echo html_writer::start_tag('div', ['class' => 'row']);
+
+// Left Column (Chat Bubbles)
+$left_col_class = $statusform ? 'col-lg-8' : 'col-lg-12';
+echo html_writer::start_tag('div', ['class' => $left_col_class]);
+
+echo html_writer::start_tag('div', ['class' => 'local_aurasupport-chat-container']);
+
+// Initial Ticket Description Bubble
+$creator = $DB->get_record('user', ['id' => $ticket->userid]);
+echo html_writer::start_tag('div', ['class' => 'local_aurasupport-bubble-wrapper user']);
+echo html_writer::tag('div', '<strong>'.fullname($creator).'</strong> ('.userdate($ticket->timecreated).')', ['class' => 'local_aurasupport-bubble-meta']);
+echo html_writer::tag('div', format_text($ticket->description), ['class' => 'local_aurasupport-bubble']);
+echo html_writer::end_tag('div');
 
 $messages = \local_aurasupport\ticket::get_messages($id);
 foreach ($messages as $msg) {
-    $msgclass = 'local_aurasupport-msg';
-    if ($msg->userid != $ticket->userid) {
-        $msgclass .= ' admin';
-    }
-    echo html_writer::tag('div', format_text($msg->message), ['class' => $msgclass]);
+    $is_admin = ($msg->userid != $ticket->userid);
+    $wrapper_class = $is_admin ? 'admin' : 'user';
+    $sender = $DB->get_record('user', ['id' => $msg->userid]);
+    
+    echo html_writer::start_tag('div', ['class' => 'local_aurasupport-bubble-wrapper ' . $wrapper_class]);
+    echo html_writer::tag('div', '<strong>'.fullname($sender).'</strong> ('.userdate($msg->timecreated).')', ['class' => 'local_aurasupport-bubble-meta']);
+    echo html_writer::tag('div', format_text($msg->message), ['class' => 'local_aurasupport-bubble']);
+    echo html_writer::end_tag('div');
 }
+echo html_writer::end_tag('div'); // End Chat Container
 
-echo html_writer::tag('hr', '');
-echo html_writer::tag('h4', get_string('reply', 'local_aurasupport'));
+// Reply Section
+echo html_writer::start_tag('div', ['class' => 'local_aurasupport-card mb-4']);
+echo html_writer::tag('div', get_string('reply', 'local_aurasupport'), ['class' => 'card-header']);
+echo html_writer::start_tag('div', ['class' => 'card-body']);
 
 if (has_capability('local/aurasupport:manage', $context) && \local_aurasupport\ai_manager::is_enabled()) {
     $ai_url = new moodle_url('/local/aurasupport/view.php', ['id' => $id, 'action' => 'generate_ai']);
@@ -119,22 +152,31 @@ if (has_capability('local/aurasupport:manage', $context) && \local_aurasupport\a
 }
 
 $mform->display();
-
-if ($statusform) {
-    echo html_writer::tag('hr', '');
-    echo html_writer::start_tag('div', ['class' => 'row']);
-    echo html_writer::start_tag('div', ['class' => 'col-md-6']);
-    echo html_writer::tag('h4', get_string('updatestatus', 'local_aurasupport'));
-    $statusform->display();
-    echo html_writer::end_tag('div');
-    
-    echo html_writer::start_tag('div', ['class' => 'col-md-6']);
-    echo html_writer::tag('h4', 'Re-assign Agent');
-    $reassignform->display();
-    echo html_writer::end_tag('div');
-    echo html_writer::end_tag('div');
-}
+echo html_writer::end_tag('div'); // End Card Body
+echo html_writer::end_tag('div'); // End Card
 
 echo html_writer::link(new moodle_url('/local/aurasupport/tickets.php'), get_string('backtotickets', 'local_aurasupport'), ['class' => 'btn btn-secondary mt-3']);
+
+echo html_writer::end_tag('div'); // End Left Column
+
+// Right Column (Action Panel for Admins)
+if ($statusform) {
+    echo html_writer::start_tag('div', ['class' => 'col-lg-4']);
+    echo html_writer::start_tag('div', ['class' => 'local_aurasupport-action-panel']);
+    
+    echo html_writer::tag('h5', get_string('updatestatus', 'local_aurasupport'), ['class' => 'font-weight-bold mb-3']);
+    $statusform->display();
+    
+    echo html_writer::tag('hr', '', ['class' => 'my-4']);
+    
+    echo html_writer::tag('h5', 'Re-assign Agent', ['class' => 'font-weight-bold mb-3']);
+    $reassignform->display();
+    
+    echo html_writer::end_tag('div'); // End Action Panel
+    echo html_writer::end_tag('div'); // End Right Column
+}
+
+echo html_writer::end_tag('div'); // End Row
+echo html_writer::end_tag('div'); // End Premium Container
 
 echo $OUTPUT->footer();

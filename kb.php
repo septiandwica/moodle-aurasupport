@@ -37,6 +37,8 @@ $PAGE->set_title('Knowledge Base');
 $PAGE->set_heading('Knowledge Base');
 
 echo $OUTPUT->header();
+
+echo html_writer::start_tag('div', ['class' => 'local_aurasupport-container']);
 local_aurasupport_print_tabs('kb');
 
 echo html_writer::start_tag('div', ['class' => 'jumbotron local_aurasupport-header']);
@@ -86,5 +88,7 @@ if ($id) {
 if (has_capability('local/aurasupport:manage', $context)) {
     echo html_writer::link(new moodle_url('/local/aurasupport/manage_kb.php'), 'Manage Articles', ['class' => 'btn btn-outline-primary mt-4']);
 }
+
+echo html_writer::end_tag('div');
 
 echo $OUTPUT->footer();

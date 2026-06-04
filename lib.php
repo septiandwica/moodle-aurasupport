@@ -110,9 +110,9 @@ function local_aurasupport_print_tabs($current_tab = 'tickets') {
         ];
     }
 
-    echo \html_writer::start_tag('ul', ['class' => 'nav nav-tabs mb-4']);
+    echo \html_writer::start_tag('ul', ['class' => 'nav local_aurasupport-nav-pills']);
     foreach ($tabs as $tab) {
-        $active = ($tab['id'] === $current_tab) ? ' active font-weight-bold' : '';
+        $active = ($tab['id'] === $current_tab) ? ' active' : '';
         echo \html_writer::start_tag('li', ['class' => 'nav-item']);
         echo \html_writer::link($tab['url'], $tab['name'], ['class' => 'nav-link' . $active]);
         echo \html_writer::end_tag('li');

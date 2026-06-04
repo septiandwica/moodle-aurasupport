@@ -57,23 +57,26 @@ if ($mform->is_cancelled()) {
 }
 
 echo $OUTPUT->header();
+
+echo html_writer::start_tag('div', ['class' => 'local_aurasupport-container']);
+
 local_aurasupport_print_tabs('tickets');
 
 // Filters UI
-echo html_writer::start_tag('div', ['class' => 'well box p-3 mb-4 bg-light border rounded']);
-echo html_writer::start_tag('form', ['action' => 'tickets.php', 'method' => 'get', 'class' => 'form-inline d-flex align-items-center']);
-echo html_writer::tag('label', 'Filter Status: ', ['class' => 'mr-2 font-weight-bold']);
+echo html_writer::start_tag('div', ['class' => 'local_aurasupport-filter-bar']);
+echo html_writer::start_tag('form', ['action' => 'tickets.php', 'method' => 'get', 'class' => 'form-inline d-flex align-items-center w-100']);
+echo html_writer::tag('label', 'Filter Status: ', ['class' => 'mr-2 font-weight-bold text-muted']);
 echo html_writer::select([
     -1 => 'All Statuses', 0 => 'Open', 1 => 'Pending', 2 => 'Resolved', 3 => 'Closed'
 ], 'filterstatus', $filterstatus, false, ['class' => 'custom-select mr-4']);
 
 $depts = $DB->get_records_menu('local_aurasupport_depts', null, 'name ASC', 'id, name');
 if (!empty($depts)) {
-    echo html_writer::tag('label', 'Department: ', ['class' => 'mr-2 font-weight-bold ml-3']);
+    echo html_writer::tag('label', 'Department: ', ['class' => 'mr-2 font-weight-bold ml-3 text-muted']);
     echo html_writer::select([0 => 'All Departments'] + $depts, 'filterdept', $filterdept, false, ['class' => 'custom-select mr-4']);
 }
 
-echo html_writer::empty_tag('input', ['type' => 'submit', 'value' => 'Apply Filter', 'class' => 'btn btn-primary ml-3']);
+echo html_writer::empty_tag('input', ['type' => 'submit', 'value' => 'Apply Filter', 'class' => 'btn btn-primary ml-auto']);
 echo html_writer::end_tag('form');
 echo html_writer::end_tag('div');
 
@@ -106,17 +109,17 @@ $sql = "SELECT t.id, t.subject, t.priority, t.status, t.timecreated,
 $tickets = $DB->get_records_sql($sql, $params);
 
 $status_map = [
-    0 => '<span class="badge badge-danger">Open</span>',
-    1 => '<span class="badge badge-warning">Pending</span>',
-    2 => '<span class="badge badge-success">Resolved</span>',
-    3 => '<span class="badge badge-secondary">Closed</span>'
+    0 => '<span class="badge badge-aura badge-danger">Open</span>',
+    1 => '<span class="badge badge-aura badge-warning text-dark">Pending</span>',
+    2 => '<span class="badge badge-aura badge-success">Resolved</span>',
+    3 => '<span class="badge badge-aura badge-secondary">Closed</span>'
 ];
 $priority_map = [
     0 => 'Low', 1 => 'Medium', 2 => 'High', 3 => 'Urgent'
 ];
 
-echo html_writer::start_tag('div', ['class' => 'table-responsive mt-4']);
-echo '<table id="ticketstable" class="table table-striped table-bordered" style="width:100%">';
+echo html_writer::start_tag('div', ['class' => 'local_aurasupport-table-wrapper']);
+echo '<table id="ticketstable" class="table table-hover" style="width:100%">';
 echo '<thead><tr>
         <th>ID</th>
         <th>Subject</th>
@@ -131,17 +134,17 @@ echo '<thead><tr>
 echo '<tbody>';
 foreach ($tickets as $t) {
     $url = new moodle_url('/local/aurasupport/view.php', ['id' => $t->id]);
-    $btn = html_writer::link($url, 'View', ['class' => 'btn btn-sm btn-info']);
+    $btn = html_writer::link($url, 'View', ['class' => 'btn btn-sm btn-outline-primary rounded-pill']);
     
     echo '<tr>';
     echo '<td>' . $t->id . '</td>';
-    echo '<td>' . s($t->subject) . '</td>';
+    echo '<td class="font-weight-bold text-dark">' . s($t->subject) . '</td>';
     echo '<td>' . s($t->firstname . ' ' . $t->lastname) . '</td>';
-    echo '<td>' . ($t->coursename ? s($t->coursename) : '-') . '</td>';
+    echo '<td>' . ($t->coursename ? s($t->coursename) : '<span class="text-muted">-</span>') . '</td>';
     echo '<td>' . s($t->department) . '</td>';
     echo '<td>' . $status_map[$t->status] . '</td>';
     echo '<td>' . $priority_map[$t->priority] . '</td>';
-    echo '<td>' . userdate($t->timecreated) . '</td>';
+    echo '<td class="text-muted">' . userdate($t->timecreated) . '</td>';
     echo '<td>' . $btn . '</td>';
     echo '</tr>';
 }
@@ -181,5 +184,7 @@ $PAGE->requires->js_amd_inline($js);
 echo html_writer::tag('hr', ['class' => 'mt-5 mb-4']);
 echo html_writer::tag('h3', get_string('createticket', 'local_aurasupport'), ['class' => 'mb-4']);
 $mform->display();
+
+echo html_writer::end_tag('div'); // Close container
 
 echo $OUTPUT->footer();

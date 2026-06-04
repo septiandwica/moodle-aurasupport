@@ -63,6 +63,8 @@ if ($mform->is_cancelled()) {
 }
 
 echo $OUTPUT->header();
+
+echo html_writer::start_tag('div', ['class' => 'local_aurasupport-container']);
 local_aurasupport_print_tabs('sla');
 
 $slas = $DB->get_records('local_aurasupport_sla', null, 'priority ASC');
@@ -93,4 +95,6 @@ echo html_writer::tag('h3', 'Configure SLA Rule');
 $mform->display();
 
 echo html_writer::link(new moodle_url('/local/aurasupport/index.php'), 'Back to Dashboard', ['class' => 'btn btn-secondary mt-3']);
+echo html_writer::end_tag('div');
+
 echo $OUTPUT->footer();

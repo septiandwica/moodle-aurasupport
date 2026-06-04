@@ -1,53 +1,270 @@
-/* AuraSupport Premium Styles */
-.local_aurasupport-card {
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    border: none;
+/* AuraSupport Premium Styles - President Theme Compatible */
+
+/* Variables */
+:root {
+    --aura-primary: #4e73df;
+    --aura-primary-light: #f1f5fb;
+    --aura-bg-light: #f8f9fc;
+    --aura-card-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+    --aura-border: #e3e6f0;
+    --aura-text-main: #5a5c69;
+    --aura-text-muted: #858796;
+    --aura-radius: 1rem;
+    --aura-chat-user: #f8f9fc;
+    --aura-chat-admin: #e8f0fe;
 }
-.local_aurasupport-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.1);
+
+/* Premium Layout Wrappers */
+.local_aurasupport-container {
+    background-color: var(--aura-bg-light);
+    border-radius: var(--aura-radius);
+    padding: 2rem;
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.05);
 }
-.local_aurasupport-msg {
-    border-radius: 12px;
-    padding: 16px;
-    margin-bottom: 16px;
-    background-color: #f8f9fa;
-    border: 1px solid #e9ecef;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+
+/* Tab Navigation (Pills) */
+.local_aurasupport-nav-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    background: white;
+    border-radius: 50rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075);
+    margin-bottom: 2rem;
+    border: 1px solid var(--aura-border);
 }
-.local_aurasupport-msg.admin {
-    background-color: #e3f2fd;
-    border-color: #bbdefb;
-}
-.local_aurasupport-header {
-    background: linear-gradient(135deg, #0d6efd 0%, #0dcaf0 100%);
-    color: white;
-    padding: 24px;
-    border-radius: 8px;
-    margin-bottom: 24px;
-    box-shadow: 0 4px 6px rgba(13, 110, 253, 0.2);
-}
-.local_aurasupport-header h2 {
-    color: white;
+
+.local_aurasupport-nav-pills .nav-item {
     margin: 0;
 }
+
+.local_aurasupport-nav-pills .nav-link {
+    border-radius: 50rem !important;
+    padding: 0.5rem 1.5rem;
+    color: var(--aura-text-main);
+    font-weight: 600;
+    transition: all 0.2s ease-in-out;
+    border: none;
+}
+
+.local_aurasupport-nav-pills .nav-link:hover {
+    background-color: var(--aura-primary-light);
+    color: var(--aura-primary);
+}
+
+.local_aurasupport-nav-pills .nav-link.active {
+    background-color: var(--aura-primary);
+    color: white;
+    box-shadow: 0 4px 6px rgba(78, 115, 223, 0.2);
+}
+
+/* Premium Cards */
+.local_aurasupport-card {
+    background: #fff;
+    border-radius: var(--aura-radius);
+    box-shadow: var(--aura-card-shadow);
+    border: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    overflow: hidden;
+}
+
+.local_aurasupport-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.5rem 2rem 0 rgba(58, 59, 69, 0.2);
+}
+
+.local_aurasupport-card .card-header {
+    background-color: #fff;
+    border-bottom: 1px solid var(--aura-border);
+    padding: 1.25rem 1.5rem;
+    font-weight: 700;
+    color: var(--aura-primary);
+}
+
+/* Chat Bubbles Interface */
+.local_aurasupport-chat-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    background: white;
+    border-radius: var(--aura-radius);
+    box-shadow: var(--aura-card-shadow);
+    margin-bottom: 2rem;
+}
+
+.local_aurasupport-bubble-wrapper {
+    display: flex;
+    flex-direction: column;
+    max-width: 80%;
+}
+
+.local_aurasupport-bubble-wrapper.user {
+    align-self: flex-start;
+}
+
+.local_aurasupport-bubble-wrapper.admin {
+    align-self: flex-end;
+    align-items: flex-end;
+}
+
+.local_aurasupport-bubble-meta {
+    font-size: 0.85rem;
+    color: var(--aura-text-muted);
+    margin-bottom: 0.4rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.local_aurasupport-bubble-meta strong {
+    color: var(--aura-text-main);
+}
+
+.local_aurasupport-bubble {
+    padding: 1rem 1.25rem;
+    border-radius: 1.25rem;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    position: relative;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.local_aurasupport-bubble p:last-child {
+    margin-bottom: 0;
+}
+
+.local_aurasupport-bubble-wrapper.user .local_aurasupport-bubble {
+    background-color: var(--aura-chat-user);
+    border: 1px solid var(--aura-border);
+    border-top-left-radius: 0.25rem;
+    color: var(--aura-text-main);
+}
+
+.local_aurasupport-bubble-wrapper.admin .local_aurasupport-bubble {
+    background-color: var(--aura-chat-admin);
+    border: 1px solid #d2e3fc;
+    border-top-right-radius: 0.25rem;
+    color: #174ea6;
+}
+
+/* Ticket Details Layout */
+.local_aurasupport-ticket-header {
+    padding: 2rem;
+    background: linear-gradient(135deg, var(--aura-primary) 0%, #224abe 100%);
+    color: white;
+    border-radius: var(--aura-radius);
+    margin-bottom: 2rem;
+    box-shadow: 0 8px 16px rgba(78, 115, 223, 0.25);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.local_aurasupport-ticket-header h2 {
+    color: white;
+    margin: 0;
+    font-weight: 700;
+}
+
+/* Action Panel */
+.local_aurasupport-action-panel {
+    background: white;
+    border-radius: var(--aura-radius);
+    box-shadow: var(--aura-card-shadow);
+    padding: 1.5rem;
+    position: sticky;
+    top: 20px;
+}
+
+/* Forms & Tables */
+.local_aurasupport-filter-bar {
+    background: white;
+    padding: 1rem 1.5rem;
+    border-radius: 50rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075);
+    margin-bottom: 2rem;
+    border: 1px solid var(--aura-border);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.local_aurasupport-table-wrapper {
+    background: white;
+    border-radius: var(--aura-radius);
+    padding: 1.5rem;
+    box-shadow: var(--aura-card-shadow);
+}
+
+table.dataTable {
+    border-collapse: collapse !important;
+}
+
+table.dataTable thead th {
+    border-bottom: 2px solid var(--aura-border);
+    color: var(--aura-text-main);
+    font-weight: 600;
+    padding: 1rem;
+}
+
+table.dataTable tbody td {
+    padding: 1rem;
+    vertical-align: middle;
+    border-color: var(--aura-border);
+}
+
+table.dataTable tbody tr:hover {
+    background-color: var(--aura-bg-light);
+}
+
+/* Badges */
+.badge-aura {
+    padding: 0.5rem 1rem;
+    border-radius: 50rem;
+    font-weight: 600;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+}
+
+/* Gradients for Dashboard */
+.bg-gradient-primary { background: linear-gradient(135deg, #4e73df 0%, #224abe 100%); color: white;}
+.bg-gradient-warning { background: linear-gradient(135deg, #f6c23e 0%, #dda20a 100%); color: white;}
+.bg-gradient-success { background: linear-gradient(135deg, #1cc88a 0%, #13855c 100%); color: white;}
+.bg-gradient-secondary { background: linear-gradient(135deg, #858796 0%, #60616f 100%); color: white;}
+.bg-gradient-danger { background: linear-gradient(135deg, #e74a3b 0%, #be2617 100%); color: white;}
+.bg-gradient-info { background: linear-gradient(135deg, #36b9cc 0%, #258391 100%); color: white;}
+
 .local_aurasupport-dashboard-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 20px;
-    margin-bottom: 24px;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
 }
+
 .local_aurasupport-stat-card {
-    border-radius: 8px;
-    padding: 20px;
+    border-radius: var(--aura-radius);
+    padding: 1.5rem;
     color: white;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
+    transition: transform 0.3s ease;
+    border: none;
 }
-.bg-gradient-primary { background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%); }
-.bg-gradient-warning { background: linear-gradient(135deg, #ffc107 0%, #ffca2c 100%); }
-.bg-gradient-success { background: linear-gradient(135deg, #28a745 0%, #218838 100%); }
-.bg-gradient-secondary { background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%); }
+
+.local_aurasupport-stat-card:hover {
+    transform: translateY(-5px);
+}
+
+.local_aurasupport-stat-card h5 {
+    font-size: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.8;
+}
