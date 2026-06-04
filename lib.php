@@ -140,3 +140,60 @@ function local_aurasupport_before_footer() {
     // Render the widget template
     return $OUTPUT->render_from_template('local_aurasupport/widget', $template_data);
 }
+
+/**
+ * Serves the files from the local_aurasupport file areas.
+ *
+ * @param stdClass $course The course object.
+ * @param stdClass $cm The course module object.
+ * @param context $context The context object.
+ * @param string $filearea The file area.
+ * @param array $args The file arguments.
+ * @param bool $forcedownload Whether to force download.
+ * @param array $options Additional options.
+ * @return void|false
+ */
+function local_aurasupport_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options=array()) {
+    global $DB, $USER;
+
+    if ($context->contextlevel != CONTEXT_SYSTEM) {
+        return false;
+    }
+
+    require_login();
+
+    if ($filearea !== 'ticket_attachment' && $filearea !== 'message_attachment') {
+        return false;
+    }
+
+    $itemid = (int)array_shift($args);
+    
+    // Check permissions
+    if ($filearea === 'ticket_attachment') {
+        $ticket = $DB->get_record('local_aurasupport_tickets', ['id' => $itemid], '*', MUST_EXIST);
+    } else {
+        $msg = $DB->get_record('local_aurasupport_messages', ['id' => $itemid], '*', MUST_EXIST);
+        $ticket = $DB->get_record('local_aurasupport_tickets', ['id' => $msg->ticketid], '*', MUST_EXIST);
+    }
+    
+    $is_agent_for_this = \local_aurasupport\ticket::is_agent_for_ticket($USER->id, $ticket);
+    if (!is_siteadmin() && $ticket->userid != $USER->id && !$is_agent_for_this) {
+        return false; // No permission
+    }
+
+    $filename = array_pop($args);
+    if (!$args) {
+        $filepath = '/';
+    } else {
+        $filepath = '/'.implode('/', $args).'/';
+    }
+
+    $fs = get_file_storage();
+    $file = $fs->get_file($context->id, 'local_aurasupport', $filearea, $itemid, $filepath, $filename);
+
+    if (!$file || $file->is_directory()) {
+        return false;
+    }
+
+    send_stored_file($file, 0, 0, $forcedownload, $options);
+}

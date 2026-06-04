@@ -37,8 +37,21 @@
                 <!-- Messages go here -->
             </div>
             <div class="p-2 bg-white">
+                <!-- Preview container for attachment -->
+                <div id="aurasupport-widget-attach-preview" class="d-none mb-2 px-2">
+                    <span class="badge badge-secondary" style="font-size: 0.8rem; display: inline-flex; align-items: center; padding: 5px 10px; border-radius: 12px; background-color: #e9ecef; color: #495057;">
+                        <i class="fa fa-image mr-2"></i> <span id="aurasupport-widget-attach-filename" style="max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></span>
+                        <i id="aurasupport-widget-attach-remove" class="fa fa-times ml-2" style="cursor: pointer; color: #dc3545;"></i>
+                    </span>
+                </div>
                 <div class="aurasupport-chat-input-wrapper">
                     <input type="hidden" id="aurasupport-widget-chat-id" value="">
+                    
+                    <button id="aurasupport-widget-btn-attach" class="aurasupport-chat-attach-btn" type="button" title="Attach Image">
+                        <i class="fa fa-paperclip"></i>
+                    </button>
+                    <input type="file" id="aurasupport-widget-attach-input" accept=".png,.jpg,.jpeg" class="d-none">
+                    
                     <input type="text" id="aurasupport-widget-chat-input" class="aurasupport-chat-input" placeholder="Type a reply...">
                     <button id="aurasupport-widget-btn-send" class="aurasupport-chat-send-btn">
                         <i class="fa fa-paper-plane"></i>
@@ -146,12 +159,17 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // API Calls
     function apiCall(action, data, callback) {
-        var formData = new FormData();
+        var formData;
+        if (data instanceof FormData) {
+            formData = data;
+        } else {
+            formData = new FormData();
+            for (var key in data) {
+                formData.append(key, data[key]);
+            }
+        }
         formData.append('sesskey', config.sesskey);
         formData.append('action', action);
-        for (var key in data) {
-            formData.append(key, data[key]);
-        }
         
         fetch(config.wwwroot + '/local/aurasupport/ajax.php', {
             method: 'POST',
@@ -230,22 +248,60 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Submit Reply
+    // Attachments logic
+    var btnAttach = document.getElementById('aurasupport-widget-btn-attach');
+    var inputAttach = document.getElementById('aurasupport-widget-attach-input');
+    var previewAttach = document.getElementById('aurasupport-widget-attach-preview');
+    var filenameAttach = document.getElementById('aurasupport-widget-attach-filename');
+    var removeAttach = document.getElementById('aurasupport-widget-attach-remove');
+    
+    btnAttach.addEventListener('click', function() {
+        inputAttach.click();
+    });
+    
+    inputAttach.addEventListener('change', function() {
+        if (this.files && this.files.length > 0) {
+            var file = this.files[0];
+            filenameAttach.textContent = file.name;
+            previewAttach.classList.remove('d-none');
+        }
+    });
+    
+    removeAttach.addEventListener('click', function() {
+        inputAttach.value = '';
+        previewAttach.classList.add('d-none');
+    });
+
+    // Send Reply
     document.getElementById('aurasupport-widget-btn-send').addEventListener('click', function() {
         var input = document.getElementById('aurasupport-widget-chat-input');
-        var ticketId = document.getElementById('aurasupport-widget-chat-id').value;
         var msg = input.value.trim();
-        if (!msg) return;
+        var id = document.getElementById('aurasupport-widget-chat-id').value;
+        var file = inputAttach.files.length > 0 ? inputAttach.files[0] : null;
         
-        input.value = '';
-        input.disabled = true;
-        this.disabled = true;
+        if (!msg && !file) return; // Allow sending just a file
         
-        apiCall('widget_send_reply', { ticketid: ticketId, message: msg }, function(res) {
-            input.disabled = false;
-            document.getElementById('aurasupport-widget-btn-send').disabled = false;
+        var btn = this;
+        var icon = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
+        
+        // Use FormData for file upload
+        var formData = new FormData();
+        formData.append('ticketid', id);
+        formData.append('message', msg);
+        if (file) {
+            formData.append('attachment', file);
+        }
+        
+        apiCall('widget_send_reply', formData, function(res) {
+            btn.disabled = false;
+            btn.innerHTML = icon;
             if (res.success) {
-                openChat(ticketId, document.getElementById('aurasupport-widget-chat-subject').textContent);
+                input.value = '';
+                inputAttach.value = '';
+                previewAttach.classList.add('d-none');
+                openChat(id, document.getElementById('aurasupport-widget-chat-subject').textContent);
             } else {
                 alert(res.error || 'Failed to send message');
             }

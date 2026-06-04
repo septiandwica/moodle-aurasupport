@@ -87,11 +87,24 @@ if ($action === 'widget_get_chat') {
             ORDER BY m.timecreated ASC";
     $messages = $DB->get_records_sql($sql, ['ticketid' => $ticketid]);
     $res = [];
+    
+    $fs = get_file_storage();
+    $syscontext = context_system::instance();
+
     foreach ($messages as $msg) {
+        $message_html = format_text($msg->message);
+        
+        // Fetch attachments
+        $files = $fs->get_area_files($syscontext->id, 'local_aurasupport', 'message_attachment', $msg->id, 'filename', false);
+        foreach ($files as $f) {
+            $url = moodle_url::make_pluginfile_url($f->get_contextid(), $f->get_component(), $f->get_filearea(), $f->get_itemid(), $f->get_filepath(), $f->get_filename());
+            $message_html .= '<br><a href="'.$url.'" target="_blank"><img src="'.$url.'" style="max-width:100%; border-radius:8px; margin-top:5px; border: 1px solid #ddd;"></a>';
+        }
+
         $res[] = [
             'id' => $msg->id,
             'sender' => fullname($msg),
-            'message' => format_text($msg->message),
+            'message' => $message_html,
             'timeago' => get_string('ago', 'message', format_time(time() - $msg->timecreated)),
             'is_mine' => ($msg->userid == $USER->id)
         ];
@@ -102,9 +115,28 @@ if ($action === 'widget_get_chat') {
 
 if ($action === 'widget_send_reply') {
     require_sesskey();
-    $message = required_param('message', PARAM_TEXT);
-    // Format message as array because ticket::add_message expects it
-    \local_aurasupport\ticket::add_message($ticketid, $USER->id, ['text' => $message, 'format' => FORMAT_MOODLE]);
+    $message = optional_param('message', '', PARAM_TEXT);
+    
+    // Create the message
+    $msgid = \local_aurasupport\ticket::add_message($ticketid, $USER->id, ['text' => $message, 'format' => FORMAT_MOODLE]);
+    
+    // Handle attachment
+    if (isset($_FILES['attachment']) && $_FILES['attachment']['error'] === UPLOAD_ERR_OK) {
+        $ext = strtolower(pathinfo($_FILES['attachment']['name'], PATHINFO_EXTENSION));
+        if (in_array($ext, ['jpg', 'jpeg', 'png'])) {
+            $fs = get_file_storage();
+            $filerecord = array(
+                'contextid' => context_system::instance()->id,
+                'component' => 'local_aurasupport',
+                'filearea'  => 'message_attachment',
+                'itemid'    => $msgid,
+                'filepath'  => '/',
+                'filename'  => $_FILES['attachment']['name']
+            );
+            $fs->create_file_from_pathname($filerecord, $_FILES['attachment']['tmp_name']);
+        }
+    }
+    
     echo json_encode(['success' => true]);
     die();
 }
