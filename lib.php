@@ -33,6 +33,7 @@ function local_aurasupport_extend_navigation(global_navigation $navigation) {
     // Add Helpdesk node to navigation
     if (isloggedin() && !isguestuser()) {
         $helpdesk = $navigation->add(get_string('pluginname', 'local_aurasupport'), new moodle_url('/local/aurasupport/tickets.php'), navigation_node::TYPE_CUSTOM, null, 'local_aurasupport');
+        $helpdesk->showinflatnavigation = true;
         
         $helpdesk->add(get_string('tickets', 'local_aurasupport'), new moodle_url('/local/aurasupport/tickets.php'));
         $helpdesk->add('Knowledge Base', new moodle_url('/local/aurasupport/kb.php'));
