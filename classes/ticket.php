@@ -41,6 +41,10 @@ class ticket {
         $ticket->timemodified = time();
         
         $id = $DB->insert_record('local_aurasupport_tickets', $ticket);
+        
+        $ticket->id = $id;
+        \local_aurasupport\email_manager::send_ticket_created($ticket);
+        
         return $id;
     }
     
@@ -71,6 +75,9 @@ class ticket {
         
         // Update ticket timemodified
         $DB->set_field('local_aurasupport_tickets', 'timemodified', time(), ['id' => $ticketid]);
+        
+        $ticket = self::get_by_id($ticketid);
+        \local_aurasupport\email_manager::send_ticket_replied($ticket, $userid);
         
         return $msgid;
     }
