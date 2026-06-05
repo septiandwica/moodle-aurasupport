@@ -130,12 +130,19 @@ function local_aurasupport_before_footer() {
         ['id' => 3, 'name' => 'Urgent', 'is_normal' => false]
     ];
 
-    // Fetch courses enrolled by user
-    require_once($CFG->dirroot.'/enrol/locallib.php');
-    $enrolled_courses = enrol_get_users_courses($USER->id, true);
+    // Fetch courses
     $course_arr = [];
-    foreach ($enrolled_courses as $c) {
-        $course_arr[] = ['id' => $c->id, 'name' => format_string($c->fullname)];
+    if (is_siteadmin()) {
+        $all_courses = $DB->get_records('course', null, 'fullname ASC', 'id, fullname');
+        foreach ($all_courses as $c) {
+            $course_arr[] = ['id' => $c->id, 'name' => format_string($c->fullname)];
+        }
+    } else {
+        require_once($CFG->dirroot.'/enrol/locallib.php');
+        $enrolled_courses = enrol_get_users_courses($USER->id, true);
+        foreach ($enrolled_courses as $c) {
+            $course_arr[] = ['id' => $c->id, 'name' => format_string($c->fullname)];
+        }
     }
 
     // Get plugin release version
