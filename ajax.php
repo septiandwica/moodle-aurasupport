@@ -77,22 +77,9 @@ if ($action === 'widget_create_ticket') {
             }
         }
 
-        // Post-Submit AI Ticket Deflection for High (2) or Urgent (3) priority
-        if ($priority == 2 || $priority == 3) {
-            require_once($CFG->dirroot . '/local/aurasupport/classes/ai_manager.php');
-            $combinedText = $subject . ' ' . $desc;
-            $suggested = \local_aurasupport\ai_manager::suggest_kb($combinedText);
-            
-            if ($suggested) {
-                $url = new moodle_url('/local/aurasupport/kb.php', ['id' => $suggested->id]);
-                $admin = get_admin();
-                $aimsg = "Hi, I am Aura AI. The issue you are experiencing seems to be related to this article: <br>";
-                $aimsg .= "<strong><a href=\"" . $url->out(false) . "\" target=\"_blank\">" . format_string($suggested->title) . "</a></strong><br><br>";
-                $aimsg .= "Does this guide help solve your problem?";
-                
-                \local_aurasupport\ticket::add_message($id, $admin->id, ['text' => $aimsg]);
-            }
-        }
+        // Post-Submit AI Ticket Deflection / Auto Response
+        require_once($CFG->dirroot . '/local/aurasupport/classes/ai_manager.php');
+        \local_aurasupport\ai_manager::process_auto_response($id, $USER->id, $subject, $desc, $priority);
 
         echo json_encode(['success' => true]);
     } else {
@@ -230,7 +217,7 @@ foreach ($messages as $msg) {
     $is_admin = ($msg->userid != $ticket->userid);
     $wrapper_class = $is_admin ? 'admin' : 'user';
     $fullname = fullname($msg); // Because we fetched firstname, lastname
-    if (strpos($msg->message, 'Hi, I am Aura AI') !== false) {
+    if (strpos($msg->message, 'I am Aura AI') !== false) {
         $fullname = 'Aura AI';
     }
     

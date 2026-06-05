@@ -31,6 +31,24 @@ class ai_manager {
         return get_config('local_aurasupport', 'enable_ai') && !empty(get_config('local_aurasupport', 'gemini_api_key'));
     }
 
+    private static function log_usage($action, $prompt_tokens, $completion_tokens) {
+        global $DB, $USER;
+        $userid = (isloggedin() && !isguestuser() && isset($USER->id)) ? $USER->id : 0;
+        
+        // Ensure table exists (in case user hasn't upgraded DB yet)
+        $dbman = $DB->get_manager();
+        $table = new \xmldb_table('local_aurasupport_ai_logs');
+        if ($dbman->table_exists($table)) {
+            $record = new \stdClass();
+            $record->userid = $userid;
+            $record->action = $action;
+            $record->tokens_prompt = $prompt_tokens;
+            $record->tokens_completion = $completion_tokens;
+            $record->timecreated = time();
+            $DB->insert_record('local_aurasupport_ai_logs', $record);
+        }
+    }
+
     public static function generate_reply($ticket_subject, $ticket_description, $history = '', $submitter_name = 'User', $agent_name = 'Agent', $dept_name = '') {
         global $CFG;
         require_once($CFG->libdir . '/filelib.php');
@@ -57,7 +75,7 @@ class ai_manager {
         $dept_str = !empty($dept_name) ? " - " . $dept_name : "";
 
         $prompt .= "\nInstructions for AI:\n";
-        $prompt .= "1. ALWAYS start with the exact greeting: 'Hi there {$submitter_name},'.\n";
+        $prompt .= "1. ALWAYS start with the exact greeting: 'Hi {$submitter_name},'.\n";
         $prompt .= "2. Show empathy and apologize for any inconvenience if the user is reporting an error or issue.\n";
         $prompt .= "3. Provide technical solutions or steps that are clear, logical, and easy to follow. Use HTML bullet points/lists if you need to explain steps.\n";
         $prompt .= "4. End the reply EXACTLY with this format:\n";
@@ -89,6 +107,11 @@ class ai_manager {
         }
 
         $result = json_decode($response);
+        
+        if (isset($result->usageMetadata)) {
+            self::log_usage('generate_reply', $result->usageMetadata->promptTokenCount ?? 0, $result->usageMetadata->candidatesTokenCount ?? 0);
+        }
+
         if (isset($result->candidates[0]->content->parts[0]->text)) {
             // Convert simple markdown-like output to HTML for Moodle editor
             $text = $result->candidates[0]->content->parts[0]->text;
@@ -97,6 +120,68 @@ class ai_manager {
         }
 
         return "<p>Failed to parse AI response.</p>";
+    }
+
+    public static function process_auto_response($ticketid, $userid, $ticket_subject, $ticket_description, $priority) {
+        global $DB;
+
+        if (!self::is_enabled()) {
+            return;
+        }
+
+        $priority_limit = get_config('local_aurasupport', 'auto_reply_priority');
+        if ($priority_limit === false) {
+            $priority_limit = 2; // Default
+        }
+
+        // Check if disabled
+        if ($priority_limit == -1) {
+            return;
+        }
+
+        // Check priority criteria
+        $should_reply = false;
+        if ($priority_limit == 0) {
+            $should_reply = true; // All
+        } else if ($priority_limit == 1 && $priority >= 1) {
+            $should_reply = true; // Medium, High, Urgent
+        } else if ($priority_limit == 2 && $priority >= 2) {
+            $should_reply = true; // High, Urgent
+        }
+
+        if (!$should_reply) {
+            return;
+        }
+
+        $mode = get_config('local_aurasupport', 'auto_reply_mode');
+        if ($mode === false) {
+            $mode = 1; // Default to KB Suggestion
+        }
+
+        $admin = get_admin();
+        $user = $DB->get_record('user', ['id' => $userid]);
+        $firstname = $user ? $user->firstname : 'User';
+
+        if ($mode == 1) {
+            // KB Suggestion Only
+            $combinedText = $ticket_subject . ' ' . strip_tags($ticket_description);
+            $suggested = self::suggest_kb($combinedText);
+            
+            if ($suggested) {
+                $url = new \moodle_url('/local/aurasupport/kb.php', ['id' => $suggested->id]);
+                $aimsg = "Hi {$firstname}, I am Aura AI. The issue you are experiencing seems to be related to this article: <br>";
+                $aimsg .= "<strong><a href=\"" . $url->out(false) . "\" target=\"_blank\">" . format_string($suggested->title) . "</a></strong><br><br>";
+                $aimsg .= "Does this guide help solve your problem?";
+                
+                \local_aurasupport\ticket::add_message($ticketid, $admin->id, ['text' => $aimsg]);
+            }
+        } else if ($mode == 2) {
+            // Full AI Reply
+            $reply_html = self::generate_reply($ticket_subject, strip_tags($ticket_description), '', $firstname, 'Aura AI', 'Support Team');
+            if ($reply_html && strpos($reply_html, 'Error from AI Provider') === false) {
+                \local_aurasupport\ticket::add_message($ticketid, $admin->id, ['text' => $reply_html]);
+            }
+        }
     }
 
     public static function suggest_kb($user_text) {
@@ -158,6 +243,11 @@ class ai_manager {
         
         if ($curl->get_info()['http_code'] === 200) {
             $result = json_decode($response);
+            
+            if (isset($result->usageMetadata)) {
+                self::log_usage('suggest_kb', $result->usageMetadata->promptTokenCount ?? 0, $result->usageMetadata->candidatesTokenCount ?? 0);
+            }
+
             if (isset($result->candidates[0]->content->parts[0]->text)) {
                 $output = trim($result->candidates[0]->content->parts[0]->text);
                 $id = (int) $output;

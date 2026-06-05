@@ -62,6 +62,11 @@ if ($mform->is_cancelled()) {
     if (!empty($data->attachments)) {
         file_save_draft_area_files($data->attachments, $context->id, 'local_aurasupport', 'ticket_attachment', $ticketid, ['subdirs' => 0, 'maxbytes' => 0, 'maxfiles' => 5]);
     }
+    
+    // Auto Response
+    require_once($CFG->dirroot . '/local/aurasupport/classes/ai_manager.php');
+    \local_aurasupport\ai_manager::process_auto_response($ticketid, $USER->id, $data->subject, $data->description['text'], $data->priority);
+
     \core\notification::add('Ticket successfully created.', \core\notification::SUCCESS);
     redirect(new moodle_url('/local/aurasupport/view.php', ['id' => $ticketid]));
 }

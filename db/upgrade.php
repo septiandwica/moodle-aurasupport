@@ -39,5 +39,24 @@ function xmldb_local_aurasupport_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026060401, 'local', 'aurasupport');
     }
 
+    if ($oldversion < 2026060405) {
+        $table = new xmldb_table('local_aurasupport_ai_logs');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('action', XMLDB_TYPE_CHAR, '50', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('tokens_prompt', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('tokens_completion', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_index('userid', XMLDB_INDEX_NOTUNIQUE, ['userid']);
+
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        upgrade_plugin_savepoint(true, 2026060405, 'local', 'aurasupport');
+    }
+
     return true;
 }

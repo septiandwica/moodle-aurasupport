@@ -47,7 +47,7 @@ $action = optional_param('action', '', PARAM_ALPHANUMEXT);
 // 1. Fetch names for BOTH manual template and AI template
 global $DB, $USER;
 $submitter = $DB->get_record('user', ['id' => $ticket->userid], 'firstname, lastname');
-$submitter_name = $submitter ? fullname($submitter) : 'User';
+$submitter_name = $submitter ? $submitter->firstname : 'User';
 
 $agent_name = fullname($USER);
 
@@ -82,7 +82,7 @@ if ($draft_text) {
 } else if (is_siteadmin() || $is_agent_for_this) {
     // If no AI draft is generated, load the standard manual template
     $dept_str = !empty($dept_name) ? " - " . $dept_name : "";
-    $default_template = "<p>Hi there {$submitter_name},</p><p><br><br></p><p>Best regards,<br><strong>{$agent_name}</strong>{$dept_str}</p>";
+    $default_template = "<p>Hi {$submitter_name},</p><p><br><br></p><p>Best regards,<br><strong>{$agent_name}</strong>{$dept_str}</p>";
     $mform->set_data(['message' => ['text' => $default_template, 'format' => FORMAT_HTML]]);
 }
 
@@ -187,7 +187,7 @@ foreach ($messages as $msg) {
     
     echo html_writer::start_tag('div', ['class' => 'local_aurasupport-bubble-wrapper ' . $wrapper_class]);
     $fullname = fullname($sender);
-    if (strpos($msg->message, 'Hi, I am Aura AI') !== false) {
+    if (strpos($msg->message, 'I am Aura AI') !== false) {
         $fullname = 'Aura AI';
     }
     echo html_writer::tag('div', '<strong>'.$fullname.'</strong> ('.userdate($msg->timecreated).')', ['class' => 'local_aurasupport-bubble-meta']);

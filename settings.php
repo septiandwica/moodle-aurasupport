@@ -60,6 +60,26 @@ if ($hassiteconfig) {
             'antigravity-agent-preview' => 'Antigravity Agent Preview (Managed Agent)'
         ]));
         
+    $settings->add(new admin_setting_configselect('local_aurasupport/auto_reply_priority',
+        'Auto-Response Priority Limit',
+        'Limit automatic AI responses to specific ticket priorities to save API costs.',
+        2, // Default to High & Urgent Only
+        [
+            0 => 'All Priorities (High Cost)',
+            1 => 'Medium, High, Urgent',
+            2 => 'High and Urgent Only (Cost Effective)',
+            -1 => 'Disabled (No Auto-Response)'
+        ]));
+
+    $settings->add(new admin_setting_configselect('local_aurasupport/auto_reply_mode',
+        'Auto-Response Mode',
+        'Choose how the AI should automatically respond to new tickets.',
+        1, // Default to KB Suggestion
+        [
+            1 => 'KB Suggestion Only (Very Cost Effective - ~150 tokens)',
+            2 => 'Full AI Reply (High Token Usage - Empathizes and attempts to solve)'
+        ]));
+
     $settings->add(new admin_setting_heading('local_aurasupport/ui_heading', 'UI Settings', 'Configure the appearance of the widget.'));
     
     $settings->add(new admin_setting_configtext('local_aurasupport/widget_footer_text',

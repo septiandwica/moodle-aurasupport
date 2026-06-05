@@ -81,6 +81,11 @@ function local_aurasupport_print_tabs($current_tab = 'tickets') {
             'url' => new moodle_url('/local/aurasupport/manage_sla.php')
         ];
         $tabs[] = [
+            'id' => 'consumption',
+            'name' => 'AI Consumption',
+            'url' => new moodle_url('/local/aurasupport/consumption.php')
+        ];
+        $tabs[] = [
             'id' => 'settings',
             'name' => 'Settings',
             'url' => new moodle_url('/admin/settings.php', ['section' => 'local_aurasupport'])
