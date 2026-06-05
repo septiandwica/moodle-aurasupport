@@ -116,6 +116,11 @@ function local_aurasupport_before_footer() {
         return '';
     }
     
+    // Hide during maintenance mode if user is not admin
+    if (!empty($CFG->maintenance_enabled) && !is_siteadmin()) {
+        return '';
+    }
+    
     // Check if widget is enabled in settings
     if (!get_config('local_aurasupport', 'enable_widget')) {
         // We can default to enabled if not set, but let's assume it's always enabled for now.
