@@ -46,11 +46,13 @@ if ($action === 'widget_create_ticket') {
     $subject = required_param('subject', PARAM_TEXT);
     $dept = required_param('department', PARAM_INT);
     $priority = required_param('priority', PARAM_INT);
+    $courseid = optional_param('courseid', 0, PARAM_INT);
     $desc = required_param('description', PARAM_TEXT);
     
     $ticket = new \stdClass();
     $ticket->userid = $USER->id;
     $ticket->departmentid = $dept;
+    $ticket->courseid = $courseid;
     $ticket->subject = $subject;
     // Format description as array because ticket::create expects it (from Moodle forms)
     $ticket->description = ['text' => $desc, 'format' => FORMAT_MOODLE];

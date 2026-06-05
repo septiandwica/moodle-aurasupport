@@ -86,6 +86,15 @@
                     </select>
                 </div>
                 <div class="mb-3">
+                    <label class="aurasupport-widget-label">Related Course (Optional)</label>
+                    <select id="aurasupport-widget-new-course" class="aurasupport-widget-input">
+                        <option value="0">None</option>
+                        {{#courses}}
+                            <option value="{{id}}">{{name}}</option>
+                        {{/courses}}
+                    </select>
+                </div>
+                <div class="mb-3">
                     <label class="aurasupport-widget-label">Priority</label>
                     <select id="aurasupport-widget-new-priority" class="aurasupport-widget-input" required>
                         {{#priorities}}
@@ -356,6 +365,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('aurasupport-widget-btn-submit').addEventListener('click', function() {
         var subject = document.getElementById('aurasupport-widget-new-subject').value;
         var dept = document.getElementById('aurasupport-widget-new-dept').value;
+        var course = document.getElementById('aurasupport-widget-new-course') ? document.getElementById('aurasupport-widget-new-course').value : 0;
         var priority = document.getElementById('aurasupport-widget-new-priority').value;
         var desc = document.getElementById('aurasupport-widget-new-desc').value;
         var attachInput = document.getElementById('aurasupport-widget-new-attach');
@@ -372,6 +382,7 @@ document.addEventListener('DOMContentLoaded', function() {
         var formData = new FormData();
         formData.append('subject', subject);
         formData.append('department', dept);
+        formData.append('courseid', course);
         formData.append('priority', priority);
         formData.append('description', desc);
         

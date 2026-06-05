@@ -47,7 +47,13 @@ class ticket_form extends \moodleform {
         }
 
         // Course selector
-        $courses = $DB->get_records_menu('course', [], 'fullname ASC', 'id, fullname');
+        require_once($CFG->dirroot.'/enrol/locallib.php');
+        global $USER;
+        $enrolled_courses = enrol_get_users_courses($USER->id, true);
+        $courses = [];
+        foreach ($enrolled_courses as $c) {
+            $courses[$c->id] = format_string($c->fullname);
+        }
         if (!empty($courses)) {
             $mform->addElement('select', 'courseid', 'Related Course (Optional)', [0 => 'None'] + $courses);
             $mform->setType('courseid', PARAM_INT);
