@@ -48,9 +48,23 @@ if ($action === 'widget_create_ticket') {
     $priority = required_param('priority', PARAM_INT);
     $courseid = optional_param('courseid', 0, PARAM_INT);
     $desc = required_param('description', PARAM_TEXT);
+    $guest_email = optional_param('guest_email', '', PARAM_EMAIL);
+    $logged_user_only = get_config('local_aurasupport', 'logged_user_only');
+    $is_guest = !isloggedin() || isguestuser();
+    
+    if ($logged_user_only && $is_guest) {
+        echo json_encode(['error' => 'Guests are not allowed to create tickets.']);
+        die();
+    }
+    
+    if ($is_guest && empty($guest_email)) {
+        echo json_encode(['error' => 'Guest email is required.']);
+        die();
+    }
     
     $ticket = new \stdClass();
-    $ticket->userid = $USER->id;
+    $ticket->userid = $is_guest ? $CFG->siteguest : $USER->id;
+    $ticket->guest_email = $guest_email;
     $ticket->departmentid = $dept;
     $ticket->courseid = $courseid;
     $ticket->subject = $subject;

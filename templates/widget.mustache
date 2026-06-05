@@ -72,6 +72,12 @@
                 <span class="font-weight-bold ml-2">Create Ticket</span>
             </div>
             <div class="p-3" style="overflow-y:auto; flex:1;">
+                {{#is_guest}}
+                <div class="mb-3">
+                    <label class="aurasupport-widget-label">Email eCampus <span class="text-danger">*</span></label>
+                    <input type="email" id="aurasupport-widget-new-email" class="aurasupport-widget-input" placeholder="student@student.president.ac.id" required>
+                </div>
+                {{/is_guest}}
                 <div class="mb-3">
                     <label class="aurasupport-widget-label">Subject <span class="text-danger">*</span></label>
                     <input type="text" id="aurasupport-widget-new-subject" class="aurasupport-widget-input" required>
@@ -369,9 +375,17 @@ document.addEventListener('DOMContentLoaded', function() {
         var priority = document.getElementById('aurasupport-widget-new-priority').value;
         var desc = document.getElementById('aurasupport-widget-new-desc').value;
         var attachInput = document.getElementById('aurasupport-widget-new-attach');
+        var guestEmail = document.getElementById('aurasupport-widget-new-email') ? document.getElementById('aurasupport-widget-new-email').value : '';
+        
+        var isGuest = {{#is_guest}}true{{/is_guest}}{{^is_guest}}false{{/is_guest}};
         
         if (!subject || !dept || !desc) {
             alert('Please fill subject, department, and description');
+            return;
+        }
+        
+        if (isGuest && !guestEmail) {
+            alert('Please provide your eCampus Email');
             return;
         }
         
@@ -385,6 +399,9 @@ document.addEventListener('DOMContentLoaded', function() {
         formData.append('courseid', course);
         formData.append('priority', priority);
         formData.append('description', desc);
+        if (guestEmail) {
+            formData.append('guest_email', guestEmail);
+        }
         
         if (attachInput.files.length > 0) {
             formData.append('attachment', attachInput.files[0]);

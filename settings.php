@@ -81,6 +81,11 @@ if ($hassiteconfig) {
         ]));
 
     $settings->add(new admin_setting_heading('local_aurasupport/ui_heading', 'UI Settings', 'Configure the appearance of the widget.'));
+
+    $settings->add(new admin_setting_configcheckbox('local_aurasupport/logged_user_only',
+        'Enable Logged User Only',
+        'If enabled, the widget is only visible to logged-in users. If disabled, guests can see it and will be asked for their eCampus email.',
+        1));
     
     $settings->add(new admin_setting_configtext('local_aurasupport/widget_footer_text',
         'Widget Footer Text',

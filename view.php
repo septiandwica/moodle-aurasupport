@@ -48,6 +48,9 @@ $action = optional_param('action', '', PARAM_ALPHANUMEXT);
 global $DB, $USER;
 $submitter = $DB->get_record('user', ['id' => $ticket->userid], 'firstname, lastname');
 $submitter_name = $submitter ? $submitter->firstname : 'User';
+if (!empty($ticket->guest_email)) {
+    $submitter_name = 'Guest';
+}
 
 $agent_name = fullname($USER);
 
@@ -150,7 +153,13 @@ echo html_writer::start_tag('div', ['class' => 'local_aurasupport-chat-container
 // Initial Ticket Description Bubble
 $creator = $DB->get_record('user', ['id' => $ticket->userid]);
 echo html_writer::start_tag('div', ['class' => 'local_aurasupport-bubble-wrapper user']);
-echo html_writer::tag('div', '<strong>'.fullname($creator).'</strong> ('.userdate($ticket->timecreated).')', ['class' => 'local_aurasupport-bubble-meta']);
+
+$creator_name = fullname($creator);
+if (!empty($ticket->guest_email)) {
+    $creator_name = 'Guest (' . s($ticket->guest_email) . ')';
+}
+
+echo html_writer::tag('div', '<strong>'.$creator_name.'</strong> ('.userdate($ticket->timecreated).')', ['class' => 'local_aurasupport-bubble-meta']);
 
 $desc_html = format_text($ticket->description);
 $fs = get_file_storage();

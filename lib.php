@@ -108,8 +108,11 @@ function local_aurasupport_print_tabs($current_tab = 'tickets') {
 function local_aurasupport_before_footer() {
     global $CFG, $USER, $PAGE, $OUTPUT;
     
-    // Only show for logged in users
-    if (!isloggedin() || isguestuser()) {
+    $logged_user_only = get_config('local_aurasupport', 'logged_user_only');
+    $is_guest = !isloggedin() || isguestuser();
+    
+    // Only show for logged in users if setting is enabled
+    if ($logged_user_only && $is_guest) {
         return '';
     }
     
@@ -170,7 +173,8 @@ function local_aurasupport_before_footer() {
         'departments' => $dept_arr,
         'priorities' => $priorities,
         'courses' => $course_arr,
-        'footer_text' => $footer_text
+        'footer_text' => $footer_text,
+        'is_guest' => $is_guest
     ];
 
     // Render the widget template

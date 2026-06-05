@@ -126,12 +126,12 @@ if ($filterdept > 0) {
     $params['dept'] = $filterdept;
 }
 
-$sql = "SELECT t.id, t.subject, t.priority, t.status, t.timecreated, 
+$sql = "SELECT t.id, t.subject, t.priority, t.status, t.timecreated, t.userid, t.guest_email,
                u.firstname, u.lastname, 
                c.fullname as coursename, 
                COALESCE(d.name, 'General') as department
         FROM {local_aurasupport_tickets} t
-        JOIN {user} u ON t.userid = u.id
+        LEFT JOIN {user} u ON t.userid = u.id
         LEFT JOIN {course} c ON t.courseid = c.id
         LEFT JOIN {local_aurasupport_depts} d ON t.departmentid = d.id
         WHERE $sqlwhere 
@@ -175,7 +175,11 @@ foreach ($tickets as $t) {
     echo '<tr>';
     echo '<td>' . $t->id . '</td>';
     echo '<td class="font-weight-bold text-dark">' . s($t->subject) . '</td>';
-    echo '<td>' . s($t->firstname . ' ' . $t->lastname) . '</td>';
+    if (!empty($t->guest_email)) {
+        echo '<td>Guest (' . s($t->guest_email) . ')</td>';
+    } else {
+        echo '<td>' . s($t->firstname . ' ' . $t->lastname) . '</td>';
+    }
     echo '<td>' . ($t->coursename ? s($t->coursename) : '<span class="text-muted">-</span>') . '</td>';
     echo '<td>' . s($t->department) . '</td>';
     echo '<td>' . $status_map[$t->status] . '</td>';
