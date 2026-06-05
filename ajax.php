@@ -146,8 +146,8 @@ if ($action === 'widget_get_chat') {
         }
 
         $sendername = fullname($msg);
-        if (strpos($msg->message, 'Hi, I am Aura AI') !== false) {
-            $sendername = 'Aura AI';
+        if (strpos($msg->message, 'Aura AI') !== false) {
+            $sendername = 'AuraSupport AI';
         }
 
         $res[] = [
@@ -217,8 +217,8 @@ foreach ($messages as $msg) {
     $is_admin = ($msg->userid != $ticket->userid);
     $wrapper_class = $is_admin ? 'admin' : 'user';
     $fullname = fullname($msg); // Because we fetched firstname, lastname
-    if (strpos($msg->message, 'I am Aura AI') !== false) {
-        $fullname = 'Aura AI';
+    if (strpos($msg->message, 'Aura AI') !== false) {
+        $fullname = 'AuraSupport AI';
     }
     
     $msg_html = format_text($msg->message);

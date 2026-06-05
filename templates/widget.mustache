@@ -73,11 +73,11 @@
             </div>
             <div class="p-3" style="overflow-y:auto; flex:1;">
                 <div class="mb-3">
-                    <label class="aurasupport-widget-label">Subject</label>
+                    <label class="aurasupport-widget-label">Subject <span class="text-danger">*</span></label>
                     <input type="text" id="aurasupport-widget-new-subject" class="aurasupport-widget-input" required>
                 </div>
                 <div class="mb-3">
-                    <label class="aurasupport-widget-label">Department</label>
+                    <label class="aurasupport-widget-label">Department <span class="text-danger">*</span></label>
                     <select id="aurasupport-widget-new-dept" class="aurasupport-widget-input" required>
                         <option value="">Select a department...</option>
                         {{#departments}}
@@ -95,7 +95,7 @@
                     </select>
                 </div>
                 <div class="mb-3">
-                    <label class="aurasupport-widget-label">Priority</label>
+                    <label class="aurasupport-widget-label">Priority <span class="text-danger">*</span></label>
                     <select id="aurasupport-widget-new-priority" class="aurasupport-widget-input" required>
                         {{#priorities}}
                             <option value="{{id}}" {{#is_normal}}selected{{/is_normal}}>{{name}}</option>
@@ -103,7 +103,7 @@
                     </select>
                 </div>
                 <div class="mb-4">
-                    <label class="aurasupport-widget-label">Description</label>
+                    <label class="aurasupport-widget-label">Description <span class="text-danger">*</span></label>
                     <textarea id="aurasupport-widget-new-desc" class="aurasupport-widget-input" rows="4" required></textarea>
                 </div>
                 <div class="mb-4">

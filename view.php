@@ -187,8 +187,8 @@ foreach ($messages as $msg) {
     
     echo html_writer::start_tag('div', ['class' => 'local_aurasupport-bubble-wrapper ' . $wrapper_class]);
     $fullname = fullname($sender);
-    if (strpos($msg->message, 'I am Aura AI') !== false) {
-        $fullname = 'Aura AI';
+    if (strpos($msg->message, 'Aura AI') !== false) {
+        $fullname = 'AuraSupport AI';
     }
     echo html_writer::tag('div', '<strong>'.$fullname.'</strong> ('.userdate($msg->timecreated).')', ['class' => 'local_aurasupport-bubble-meta']);
     echo html_writer::tag('div', $msg_html, ['class' => 'local_aurasupport-bubble']);
