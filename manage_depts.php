@@ -33,6 +33,10 @@ require_capability('moodle/site:config', $context);
 $delete = optional_param('delete', 0, PARAM_INT);
 if ($delete) {
     require_sesskey();
+    global $DB;
+    // Cascade: nullify departmentid on tickets, remove agents for this dept
+    $DB->set_field('local_aurasupport_tickets', 'departmentid', null, ['departmentid' => $delete]);
+    $DB->delete_records('local_aurasupport_agents', ['departmentid' => $delete]);
     $DB->delete_records('local_aurasupport_depts', ['id' => $delete]);
     redirect(new moodle_url('/local/aurasupport/manage_depts.php'));
 }

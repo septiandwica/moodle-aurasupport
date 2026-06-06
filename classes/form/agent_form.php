@@ -35,7 +35,7 @@ class agent_form extends \moodleform {
         $mform->addElement('text', 'useremail', 'User Email', 'maxlength="100" size="30"');
         $mform->setType('useremail', PARAM_EMAIL);
         $mform->addRule('useremail', null, 'required', null, 'client');
-        $mform->addHelpButton('useremail', 'Enter the exact email of the user to make them an agent.', 'local_aurasupport');
+        $mform->addElement('static', 'useremail_help', '', 'Enter the exact email of the user to make them an agent.');
 
         $depts = $DB->get_records_menu('local_aurasupport_depts', null, 'name ASC', 'id, name');
         if (empty($depts)) {

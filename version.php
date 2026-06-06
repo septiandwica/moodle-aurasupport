@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->version   = 2026060500;
-$plugin->requires  = 2020041500;
+$plugin->requires  = 2022041900; // Moodle 4.0 minimum (uses 4.x notification/AMD APIs)
 $plugin->component = 'local_aurasupport'; // Full name of the plugin.
 $plugin->maturity  = MATURITY_ALPHA;
 $plugin->release   = 'v1.0.0-alpha';

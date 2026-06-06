@@ -47,17 +47,14 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_configselect('local_aurasupport/gemini_model',
         'Gemini Model',
         'Select the model to use for AI responses.',
-        'gemini-3.5-flash',
+        'gemini-2.5-flash',
         [
-            'gemini-3.5-flash' => 'Gemini 3.5 Flash (Most Intelligent Agentic)',
-            'gemini-3.1-pro' => 'Gemini 3.1 Pro (Advanced Intelligence)',
-            'gemini-3' => 'Gemini 3',
-            'gemini-3-flash' => 'Gemini 3 Flash (Frontier Performance)',
-            'gemini-3.1-flash-lite' => 'Gemini 3.1 Flash-Lite (Fast & Cost Efficient)',
-            'gemini-2.5-pro' => 'Gemini 2.5 Pro (Deep Reasoning)',
-            'gemini-2.5-flash' => 'Gemini 2.5 Flash (Best Price-Performance)',
+            'gemini-2.5-pro'        => 'Gemini 2.5 Pro (Deep Reasoning)',
+            'gemini-2.5-flash'      => 'Gemini 2.5 Flash (Best Price-Performance)',
             'gemini-2.5-flash-lite' => 'Gemini 2.5 Flash-Lite (Budget-friendly)',
-            'antigravity-agent-preview' => 'Antigravity Agent Preview (Managed Agent)'
+            'gemini-2.0-flash'      => 'Gemini 2.0 Flash',
+            'gemini-1.5-pro'        => 'Gemini 1.5 Pro (Legacy)',
+            'gemini-1.5-flash'      => 'Gemini 1.5 Flash (Legacy)',
         ]));
         
     $settings->add(new admin_setting_configselect('local_aurasupport/auto_reply_priority',

@@ -38,7 +38,7 @@ require_login();
 $is_agent_for_this = \local_aurasupport\ticket::is_agent_for_ticket($USER->id, $ticket);
 
 if (!is_siteadmin() && $ticket->userid != $USER->id && !$is_agent_for_this) {
-    print_error('nopermissions', 'error', '', 'view this ticket');
+    throw new \moodle_exception('nopermissions', 'error', '', 'view this ticket');
 }
 
 $draft_text = '';
@@ -62,8 +62,9 @@ if (!empty($ticket->departmentid)) {
     }
 }
 
-// 2. Generate AI Draft if requested
+// 2. Generate AI Draft if requested (POST + sesskey to prevent CSRF token consumption)
 if ($action === 'generate_ai' && (is_siteadmin() || $is_agent_for_this) && \local_aurasupport\ai_manager::is_enabled()) {
+    require_sesskey();
     $messages = \local_aurasupport\ticket::get_messages($id);
     $history = '';
     foreach ($messages as $m) {
@@ -96,16 +97,16 @@ if (is_siteadmin() || $is_agent_for_this) {
     $statusform = new \local_aurasupport\form\status_form(null, ['ticketid' => $id]);
     $statusform->set_data(['status' => $ticket->status]);
     
-    if ($statusform->is_submitted() && $statusform->is_validated() && $statusdata = $statusform->get_data()) {
+    if ($statusdata = $statusform->get_data()) {
         \local_aurasupport\ticket::update_status($id, $statusdata->status);
         redirect(new moodle_url('/local/aurasupport/view.php', ['id' => $id]), get_string('statusupdated', 'local_aurasupport'), null, \core\output\notification::NOTIFY_SUCCESS);
     }
-    
+
     // Re-assign Form
     $reassignform = new \local_aurasupport\form\reassign_form(null, ['ticketid' => $id]);
     $reassignform->set_data(['agentid' => $ticket->agentid]);
-    
-    if ($reassignform->is_submitted() && $reassignform->is_validated() && $reassigndata = $reassignform->get_data()) {
+
+    if ($reassigndata = $reassignform->get_data()) {
         $DB->set_field('local_aurasupport_tickets', 'agentid', $reassigndata->agentid, ['id' => $id]);
         redirect(new moodle_url('/local/aurasupport/view.php', ['id' => $id]), 'Agent re-assigned successfully.', null, \core\output\notification::NOTIFY_SUCCESS);
     }
@@ -257,7 +258,7 @@ if ($ticket->status != 2 && $ticket->status != 3) {
     echo html_writer::start_tag('div', ['class' => 'card-body']);
 
     if ((is_siteadmin() || $is_agent_for_this) && \local_aurasupport\ai_manager::is_enabled()) {
-        $ai_url = new moodle_url('/local/aurasupport/view.php', ['id' => $id, 'action' => 'generate_ai']);
+        $ai_url = new moodle_url('/local/aurasupport/view.php', ['id' => $id, 'action' => 'generate_ai', 'sesskey' => sesskey()]);
         echo html_writer::link($ai_url, '✨ Draft Response with Gemini AI', ['class' => 'btn btn-outline-primary mb-3']);
     }
 

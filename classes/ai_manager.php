@@ -34,19 +34,14 @@ class ai_manager {
     private static function log_usage($action, $prompt_tokens, $completion_tokens) {
         global $DB, $USER;
         $userid = (isloggedin() && !isguestuser() && isset($USER->id)) ? $USER->id : 0;
-        
-        // Ensure table exists (in case user hasn't upgraded DB yet)
-        $dbman = $DB->get_manager();
-        $table = new \xmldb_table('local_aurasupport_ai_logs');
-        if ($dbman->table_exists($table)) {
-            $record = new \stdClass();
-            $record->userid = $userid;
-            $record->action = $action;
-            $record->tokens_prompt = $prompt_tokens;
-            $record->tokens_completion = $completion_tokens;
-            $record->timecreated = time();
-            $DB->insert_record('local_aurasupport_ai_logs', $record);
-        }
+
+        $record = new \stdClass();
+        $record->userid = $userid;
+        $record->action = $action;
+        $record->tokens_prompt = $prompt_tokens;
+        $record->tokens_completion = $completion_tokens;
+        $record->timecreated = time();
+        $DB->insert_record('local_aurasupport_ai_logs', $record);
     }
 
     public static function generate_reply($ticket_subject, $ticket_description, $history = '', $submitter_name = 'User', $agent_name = 'Agent', $dept_name = '') {
@@ -60,10 +55,10 @@ class ai_manager {
 
         $model = get_config('local_aurasupport', 'gemini_model');
         if (empty($model)) {
-            $model = 'gemini-3.5-flash';
+            $model = 'gemini-2.5-flash';
         }
 
-        $url = 'https://generativelanguage.googleapis.com/v1beta/models/' . $model . ':generateContent?key=' . $apikey;
+        $url = 'https://generativelanguage.googleapis.com/v1beta/models/' . $model . ':generateContent';
 
         $prompt = "You are a highly professional, empathetic, and solution-oriented IT Support/Customer Service agent. Your task is to draft a reply for a user's (student/teacher/staff) support ticket.\n\n";
         $prompt .= "Ticket Subject: " . $ticket_subject . "\n";
@@ -99,11 +94,12 @@ class ai_manager {
 
         $curl = new \curl();
         $curl->setHeader('Content-Type: application/json');
-        
+        $curl->setHeader('x-goog-api-key: ' . $apikey);
+
         $response = $curl->post($url, json_encode($data));
-        
+
         if ($curl->get_info()['http_code'] !== 200) {
-            return "<p><em>Error from AI Provider:</em> " . s($response) . "</p>";
+            return "<p><em>Error from AI Provider.</em></p>";
         }
 
         $result = json_decode($response);
@@ -207,10 +203,10 @@ class ai_manager {
         $apikey = get_config('local_aurasupport', 'gemini_api_key');
         $model = get_config('local_aurasupport', 'gemini_model');
         if (empty($model)) {
-            $model = 'gemini-3.5-flash';
+            $model = 'gemini-2.5-flash';
         }
 
-        $url = 'https://generativelanguage.googleapis.com/v1beta/models/' . $model . ':generateContent?key=' . $apikey;
+        $url = 'https://generativelanguage.googleapis.com/v1beta/models/' . $model . ':generateContent';
 
         $prompt = "You are an intelligent support routing AI.\n";
         $prompt .= "A user is writing a support ticket with the following issue description/subject:\n";
@@ -238,9 +234,10 @@ class ai_manager {
 
         $curl = new \curl();
         $curl->setHeader('Content-Type: application/json');
-        
+        $curl->setHeader('x-goog-api-key: ' . $apikey);
+
         $response = $curl->post($url, json_encode($data));
-        
+
         if ($curl->get_info()['http_code'] === 200) {
             $result = json_decode($response);
             

@@ -32,6 +32,7 @@ class ticket {
         $ticket = new \stdClass();
         $ticket->userid = isset($data->userid) ? $data->userid : $USER->id;
         $ticket->courseid = isset($data->courseid) ? $data->courseid : null;
+        $ticket->guest_email = isset($data->guest_email) ? $data->guest_email : '';
         $ticket->subject = $data->subject;
         $ticket->description = $data->description['text'];
         $ticket->status = 0; // 0 = Open

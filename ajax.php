@@ -76,8 +76,10 @@ if ($action === 'widget_create_ticket') {
     $id = \local_aurasupport\ticket::create($ticket);
     if ($id) {
         if (isset($_FILES['attachment']) && $_FILES['attachment']['error'] === UPLOAD_ERR_OK) {
-            $ext = strtolower(pathinfo($_FILES['attachment']['name'], PATHINFO_EXTENSION));
-            if (in_array($ext, ['jpg', 'jpeg', 'png'])) {
+            $allowed_mimes = ['image/jpeg', 'image/png'];
+            $detected_mime = mime_content_type($_FILES['attachment']['tmp_name']);
+            if (in_array($detected_mime, $allowed_mimes)) {
+                $safe_filename = clean_filename($_FILES['attachment']['name']);
                 $fs = get_file_storage();
                 $filerecord = array(
                     'contextid' => context_system::instance()->id,
@@ -85,7 +87,7 @@ if ($action === 'widget_create_ticket') {
                     'filearea'  => 'ticket_attachment',
                     'itemid'    => $id,
                     'filepath'  => '/',
-                    'filename'  => $_FILES['attachment']['name']
+                    'filename'  => $safe_filename
                 );
                 $fs->create_file_from_pathname($filerecord, $_FILES['attachment']['tmp_name']);
             }
@@ -93,7 +95,8 @@ if ($action === 'widget_create_ticket') {
 
         // Post-Submit AI Ticket Deflection / Auto Response
         require_once($CFG->dirroot . '/local/aurasupport/classes/ai_manager.php');
-        \local_aurasupport\ai_manager::process_auto_response($id, $USER->id, $subject, $desc, $priority);
+        // Use actual userid (siteguest for guest) — not $USER->id which may differ
+        \local_aurasupport\ai_manager::process_auto_response($id, $ticket->userid, $subject, $desc, $priority);
 
         echo json_encode(['success' => true]);
     } else {
@@ -194,8 +197,10 @@ if ($action === 'widget_send_reply') {
     
     // Handle attachment
     if (isset($_FILES['attachment']) && $_FILES['attachment']['error'] === UPLOAD_ERR_OK) {
-        $ext = strtolower(pathinfo($_FILES['attachment']['name'], PATHINFO_EXTENSION));
-        if (in_array($ext, ['jpg', 'jpeg', 'png'])) {
+        $allowed_mimes = ['image/jpeg', 'image/png'];
+        $detected_mime = mime_content_type($_FILES['attachment']['tmp_name']);
+        if (in_array($detected_mime, $allowed_mimes)) {
+            $safe_filename = clean_filename($_FILES['attachment']['name']);
             $fs = get_file_storage();
             $filerecord = array(
                 'contextid' => context_system::instance()->id,
@@ -203,7 +208,7 @@ if ($action === 'widget_send_reply') {
                 'filearea'  => 'message_attachment',
                 'itemid'    => $msgid,
                 'filepath'  => '/',
-                'filename'  => $_FILES['attachment']['name']
+                'filename'  => $safe_filename
             );
             $fs->create_file_from_pathname($filerecord, $_FILES['attachment']['tmp_name']);
         }
@@ -214,6 +219,7 @@ if ($action === 'widget_send_reply') {
 }
 
 // Default action: Long-polling (Backward compatibility for view.php)
+require_sesskey();
 $lastmsgid = optional_param('lastmsgid', 0, PARAM_INT);
 global $DB;
 $sql = "SELECT m.*, u.firstname, u.lastname 
