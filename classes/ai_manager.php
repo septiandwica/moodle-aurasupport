@@ -44,7 +44,7 @@ class ai_manager {
         $DB->insert_record('local_aurasupport_ai_logs', $record);
     }
 
-    public static function generate_reply($ticket_subject, $ticket_description, $history = '', $submitter_name = 'User', $agent_name = 'Agent', $dept_name = '') {
+    public static function generate_reply($ticket_subject, $ticket_description, $history = '', $submitter_name = 'User', $agent_name = 'Agent', $dept_name = '', $kb_context = '') {
         global $CFG;
         require_once($CFG->libdir . '/filelib.php');
 
@@ -60,7 +60,15 @@ class ai_manager {
 
         $url = 'https://generativelanguage.googleapis.com/v1beta/models/' . $model . ':generateContent';
 
-        $prompt = "You are a highly professional, empathetic, and solution-oriented IT Support/Customer Service agent. Your task is to draft a reply for a user's (student/teacher/staff) support ticket.\n\n";
+        $prompt = "You are 'Aura AI', a highly professional, empathetic, and solution-oriented IT Support agent for PRESOLA (President Online Learning Academy). Your task is to draft a reply for a user's (student/teacher/staff) support ticket.\n\n";
+
+        if (!empty($kb_context)) {
+            $prompt .= "--- KNOWLEDGE BASE CONTEXT ---\n";
+            $prompt .= "You MUST base your technical solutions STRICTLY on the following Knowledge Base articles. Do NOT invent features that don't exist in the context.\n";
+            $prompt .= $kb_context . "\n";
+            $prompt .= "------------------------------\n\n";
+        }
+
         $prompt .= "Ticket Subject: " . $ticket_subject . "\n";
         $prompt .= "Ticket Description: " . $ticket_description . "\n";
         if (!empty($history)) {
@@ -71,13 +79,14 @@ class ai_manager {
 
         $prompt .= "\nInstructions for AI:\n";
         $prompt .= "1. ALWAYS start with the exact greeting: 'Hi {$submitter_name},'.\n";
-        $prompt .= "2. Show empathy and apologize for any inconvenience if the user is reporting an error or issue.\n";
-        $prompt .= "3. Provide technical solutions or steps that are clear, logical, and easy to follow. Use HTML bullet points/lists if you need to explain steps.\n";
-        $prompt .= "4. End the reply EXACTLY with this format:\n";
+        $prompt .= "2. ONLY answer questions that are related to Moodle, PRESOLA, e-Learning, or IT Support.\n";
+        $prompt .= "3. If the user asks something completely unrelated (like math 1+1, general trivia, history) or if the issue requires manual human intervention not covered in the Knowledge Base, DO NOT attempt to answer it. Instead, politely reply: 'I could not find an exact solution for your request in my knowledge base. I have forwarded this ticket to the administration team, and a human agent will contact you shortly to assist further.'\n";
+        $prompt .= "4. Show empathy and apologize for any inconvenience if the user is reporting an error or issue.\n";
+        $prompt .= "5. End the reply EXACTLY with this format:\n";
         $prompt .= "   Best regards,\n";
         $prompt .= "   {$agent_name}{$dept_str}\n";
-        $prompt .= "5. DO NOT reply with introductory meta-text like 'Sure, here is the draft'. Output ONLY the body of the reply itself.\n";
-        $prompt .= "6. Format the response using clean, pure HTML elements (use <p>, <ul>, <li>, <strong>, <br>).\n";
+        $prompt .= "6. DO NOT reply with introductory meta-text like 'Sure, here is the draft'. Output ONLY the body of the reply itself.\n";
+        $prompt .= "7. Format the response using clean, pure HTML elements (use <p>, <ul>, <li>, <strong>, <br>).\n";
 
         $data = [
             'contents' => [
@@ -173,7 +182,15 @@ class ai_manager {
             }
         } else if ($mode == 2) {
             // Full AI Reply
-            $reply_html = self::generate_reply($ticket_subject, strip_tags($ticket_description), '', $firstname, 'Aura AI', 'Support Team');
+            $kbs = $DB->get_records('local_aurasupport_kb');
+            $kb_context = "";
+            if (!empty($kbs)) {
+                foreach ($kbs as $kb) {
+                    $kb_context .= "Title: {$kb->title}\nContent: " . strip_tags($kb->content) . "\n\n";
+                }
+            }
+
+            $reply_html = self::generate_reply($ticket_subject, strip_tags($ticket_description), '', $firstname, 'Aura AI', 'Support Team', $kb_context);
             if ($reply_html && strpos($reply_html, 'Error from AI Provider') === false) {
                 \local_aurasupport\ticket::add_message($ticketid, $admin->id, ['text' => $reply_html]);
             }
